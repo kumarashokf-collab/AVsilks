@@ -1,0 +1,20 @@
+{
+  "name": "av-silks-backend",
+  "version": "1.0.0",
+  "description": "AV Silks Backend",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "firebase-admin": "^12.7.0",
+    "joi": "^17.13.0",
+    "pdfkit": "^0.15.0",
+    "razorpay": "^2.9.4"
+  }
+}

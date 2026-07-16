@@ -1,0 +1,4 @@
+body { margin: 0; font-family: sans-serif; }
+.navbar { display: flex; padding: 15px; background: #fff; }
+.product-grid { display: flex; flex-wrap: wrap; }
+.product-card { width: 200px; padding: 10px; border: 1px solid #ccc; }
