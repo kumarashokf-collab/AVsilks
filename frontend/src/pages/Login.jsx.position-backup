@@ -1,0 +1,87 @@
+import React, { useState, useEffect } from "react";
+import { auth } from "../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { isAdminUser } from "../constants/admin";
+
+function Login() {
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [showOtp, setShowOtp] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Captcha ని పూర్తిగా కంటికి కనిపించకుండా (invisible) సెట్ చేశాం
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 
+        'size': 'invisible' 
+      });
+    }
+  }, []);
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if(phone.length !== 10) return alert("దయచేసి 10 అంకెల ఫోన్ నంబర్ ఇవ్వండి.");
+    setLoading(true);
+    const appVerifier = window.recaptchaVerifier;
+    try {
+      window.confirmationResult = await signInWithPhoneNumber(auth, "+91" + phone, appVerifier);
+      setShowOtp(true);
+      setLoading(false);
+    } catch (err) { 
+      setLoading(false);
+      alert("Error: నెట్‌వర్క్ లేదా భద్రతా సమస్య. దయచేసి మళ్ళీ ప్రయత్నించండి."); 
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await window.confirmationResult.confirm(otp);
+      setLoading(false);
+      if (phone === "7729911578") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+    } catch (err) { 
+      setLoading(false);
+      alert("Invalid OTP! దయచేసి సరైన కోడ్ ఇవ్వండి."); 
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "#fcf9f2", padding: "20px" }}>
+      {/* Invisible Captcha Container */}
+      <div id="recaptcha-container" style={{ display: "none" }}></div>
+      
+      <div style={{ background: "white", padding: "40px 30px", borderRadius: "12px", boxShadow: "0 8px 24px rgba(0,0,0,0.08)", textAlign: "center", width: "100%", maxWidth: "400px" }}>
+        <img src="https://i.ibb.co/RpGPC0hK/1000224386.png" alt="AV Silks" style={{ height: "70px", marginBottom: "15px" }} />
+        <h2 style={{ color: "#4a1c1c", marginBottom: "5px", fontSize: "22px" }}>Welcome to AV Silks</h2>
+        <p style={{ color: "#777", fontSize: "14px", marginBottom: "30px" }}>Sign in to continue</p>
+        
+        {!showOtp ? (
+          <form onSubmit={handleSendOtp} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", border: "1.5px solid #e0e0e0", borderRadius: "8px", overflow: "hidden", transition: "border 0.3s" }}>
+              <span style={{ background: "#f8f9fa", padding: "14px", borderRight: "1.5px solid #e0e0e0", color: "#333", fontWeight: "bold" }}>+91</span>
+              <input type="number" placeholder="Enter Mobile Number" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: "14px", width: "100%", border: "none", outline: "none", fontSize: "16px" }} required />
+            </div>
+            <button type="submit" disabled={loading} style={{ background: "#f90", color: "#fff", padding: "14px", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "16px", cursor: "pointer", boxShadow: "0 4px 12px rgba(255, 153, 0, 0.3)" }}>
+              {loading ? "Sending OTP..." : "Get OTP"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <input type="number" placeholder="Enter 6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} style={{ padding: "14px", border: "1.5px solid #e0e0e0", borderRadius: "8px", outline: "none", fontSize: "16px", textAlign: "center", letterSpacing: "2px" }} required />
+            <button type="submit" disabled={loading} style={{ background: "#4a1c1c", color: "white", padding: "14px", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "16px", cursor: "pointer", boxShadow: "0 4px 12px rgba(74, 28, 28, 0.3)" }}>
+              {loading ? "Verifying..." : "Verify & Login"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+export default Login;

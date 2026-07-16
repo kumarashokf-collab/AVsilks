@@ -1,0 +1,226 @@
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import { useOrders } from "../context/OrderContext";
+
+export default function Checkout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { clearCart } = useCart();
+  const { placeOrder } = useOrders();
+
+  const items =
+    location.state?.items ||
+    (location.state?.product
+      ? [{ ...location.state.product, quantity: 1 }]
+      : []);
+
+  const total = items.reduce(
+    (sum, item) => sum + Number(item.price) * Number(item.quantity || 1),
+    0
+  );
+
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    house: "",
+    street: "",
+    city: "",
+    state: "",
+    pin: "",
+  });
+
+  const change = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };  const handlePlaceOrder = () => {
+    if (
+      !form.name ||
+      !form.phone ||
+      !form.house ||
+      !form.street ||
+      !form.city ||
+      !form.state ||
+      !form.pin
+    ) {
+      alert("దయచేసి అన్ని వివరాలు నమోదు చేయండి.");
+      return;
+    }
+
+    if (items.length === 0) {
+      alert("మీ కార్ట్ ఖాళీగా ఉంది.");
+      return;
+    }
+
+    placeOrder({
+      customer: form,
+      items,
+      total,
+      payment: "Cash on Delivery",
+    });
+
+    clearCart();
+
+    alert("🎉 మీ ఆర్డర్ విజయవంతంగా నమోదు చేయబడింది!");
+
+    navigate("/profile");
+  };
+
+  return (
+    <div
+      style={{
+        maxWidth: "700px",
+        margin: "20px auto",
+        padding: "20px",
+      }}
+    >
+      <h2>Checkout</h2>
+
+      <input
+        name="name"
+        placeholder="Full Name"
+        value={form.name}
+        onChange={change}
+        style={inputStyle}
+      />
+
+      <input
+        name="phone"
+        placeholder="Phone Number"
+        value={form.phone}
+        onChange={change}
+        style={inputStyle}
+      />
+
+      <input
+        name="house"
+        placeholder="House / Flat No"
+        value={form.house}
+        onChange={change}
+        style={inputStyle}
+      />
+
+      <input
+        name="street"
+        placeholder="Street"
+        value={form.street}
+        onChange={change}
+        style={inputStyle}
+      />      <input
+        name="city"
+        placeholder="City / Village"
+        value={form.city}
+        onChange={change}
+        style={inputStyle}
+      />
+
+      <input
+        name="state"
+        placeholder="State"
+        value={form.state}
+        onChange={change}
+        style={inputStyle}
+      />
+
+      <input
+        name="pin"
+        placeholder="PIN Code"
+        value={form.pin}
+        onChange={change}
+        inputMode="numeric"
+        style={inputStyle}
+      />
+
+      <div
+        style={{
+          marginTop: "20px",
+          padding: "15px",
+          background: "#fff8f0",
+          borderRadius: "10px",
+          border: "1px solid #ead39b",
+        }}
+      >
+             <div
+        style={{
+          marginTop: "20px",
+          padding: "15px",
+          background: "#ffffff",
+          border: "1px solid #eee4dc",
+          borderRadius: "10px",
+        }}
+      >
+        <h3 style={{ marginBottom: "10px" }}>
+          Payment Method
+        </h3>
+
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            fontWeight: "bold",
+          }}
+        >
+          <input
+            type="radio"
+            name="payment"
+            checked
+            readOnly
+          />
+          Cash on Delivery
+        </label>
+
+        <p
+          style={{
+            margin: "10px 0 0",
+            color: "#705e57",
+            fontSize: "13px",
+          }}
+        >
+          Online payment will be enabled after secure
+          Razorpay integration.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={handlePlaceOrder}
+        disabled={items.length === 0}
+        style={{
+          width: "100%",
+          marginTop: "20px",
+          padding: "15px",
+          border: "none",
+          borderRadius: "8px",
+          background:
+            items.length === 0 ? "#999999" : "#7b2928",
+          color: "#ffffff",
+          fontSize: "16px",
+          fontWeight: "bold",
+          cursor:
+            items.length === 0
+              ? "not-allowed"
+              : "pointer",
+        }}
+      >
+        Place Cash on Delivery Order
+      </button>
+    </div>
+  );
+}
+
+const inputStyle = {
+  width: "100%",
+  marginBottom: "12px",
+  padding: "13px",
+  border: "1px solid #dbc9bd",
+  borderRadius: "8px",
+  background: "#ffffff",
+  color: "#2c1b17",
+  fontSize: "15px",
+  outline: "none",
+  boxSizing: "border-box",
+};

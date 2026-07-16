@@ -1,0 +1,118 @@
+.category-section {
+  background:
+    linear-gradient(
+      180deg,
+      var(--color-white),
+      var(--color-cream-100)
+    );
+}
+
+.category-section__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 78%);
+  gap: var(--space-4);
+  padding: var(--space-1) var(--space-1) var(--space-4);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: thin;
+}
+
+.category-card {
+  min-height: 136px;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  scroll-snap-align: start;
+  background:
+    linear-gradient(
+      145deg,
+      var(--color-white),
+      var(--color-cream-100)
+    );
+  color: var(--color-text-primary);
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.category-card:hover {
+  border-color: var(--color-gold-500);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.category-card:active {
+  transform: translateY(0);
+}
+
+.category-card__icon {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  background: var(--color-gold-100);
+  font-size: 1.6rem;
+}
+
+.category-card__content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.category-card__content strong {
+  color: var(--color-wine-900);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-lg);
+}
+
+.category-card__content small {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+.category-card__arrow {
+  color: var(--color-gold-700);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+@media (min-width: 700px) {
+  .category-section__grid {
+    grid-auto-flow: initial;
+    grid-auto-columns: initial;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+  }
+}
+
+@media (min-width: 1050px) {
+  .category-section__grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .category-card {
+    min-height: 190px;
+    padding: var(--space-4);
+    grid-template-columns: 1fr;
+    justify-items: center;
+    align-content: center;
+    text-align: center;
+  }
+
+  .category-card__arrow {
+    display: none;
+  }
+}

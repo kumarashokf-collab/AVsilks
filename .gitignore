@@ -1,0 +1,37 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+firebase-admin-key.json
+serviceAccountKey.json
+**/firebase-admin-key.json
+**/serviceAccountKey.json
+source-zips/
+old-root-app/
+
+# Build and dependency folders
+**/node_modules/
+**/dist/
+**/.firebase/
+
+# Local secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Private keys
+**/*serviceAccount*.json
+**/*firebase-admin-key*.json
+**/*private-key*
+
+# Backups and archives
+*.zip
+*.tar
+*.tar.gz
+*.bak
+*.backup
+*.before-*
+*.original
+avsilks-backups/

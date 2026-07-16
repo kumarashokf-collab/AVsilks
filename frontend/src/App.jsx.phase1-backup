@@ -1,0 +1,62 @@
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, requestNotificationPermission } from './firebase'; // ఇక్కడ ఇంపోర్ట్ యాడ్ చేశాము
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Cart from './pages/Cart';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Login from './pages/Login';
+import Admin from './pages/Admin';
+import Checkout from './pages/Checkout';
+import ProductDetails from './pages/ProductDetails';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import SecurityLock from './components/SecurityLock';
+import { CartProvider } from './context/CartContext';
+import { ProductProvider } from './context/ProductContext';
+import { OrderProvider } from './context/OrderContext';
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // నోటిఫికేషన్ పర్మిషన్ అడగడం
+    requestNotificationPermission();
+    
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  if (loading) return <div style={{textAlign: "center", marginTop: "20px"}}>Loading...</div>;
+
+  return (
+    <SecurityLock>
+      <OrderProvider>
+        <ProductProvider>
+          <CartProvider>
+            <Router>
+              {user && <Navbar user={user} />}
+              <Routes>
+                <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+                <Route path="/" element={user ? <Home /> : <Navigate to="/login" />} />
+                <Route path="/product/:id" element={user ? <ProductDetails /> : <Navigate to="/login" />} />
+                <Route path="/cart" element={user ? <Cart /> : <Navigate to="/login" />} />
+                <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+                <Route path="/settings" element={user ? <Settings /> : <Navigate to="/login" />} />
+                <Route path="/checkout" element={user ? <Checkout /> : <Navigate to="/login" />} />
+                <Route path="/privacy" element={user ? <PrivacyPolicy /> : <Navigate to="/login" />} />
+                <Route path="/admin" element={user?.phoneNumber === "+917729911578" ? <Admin /> : <Navigate to="/" />} />
+              </Routes>
+            </Router>
+          </CartProvider>
+        </ProductProvider>
+      </OrderProvider>
+    </SecurityLock>
+  );
+}
+export default App;

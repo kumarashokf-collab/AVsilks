@@ -1,0 +1,167 @@
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.product-card {
+  width: 100% !important;
+  max-width: 200px;
+}
+
+/* AV Silks mobile viewport protection */
+html {
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+/* Final mobile width protection */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+body {
+  min-width: 0 !important;
+}
+
+.container {
+  width: min(100% - 24px, 1200px) !important;
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  main,
+  section,
+  article,
+  header,
+  footer {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 10vw, 3.3rem) !important;
+    overflow-wrap: anywhere;
+  }
+
+  .hero,
+  .hero__inner,
+  .hero-grid,
+  .home-hero,
+  .home-hero__inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .category-grid,
+  .products-grid,
+  .featured-grid {
+    width: 100% !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Emergency mobile overflow correction */
+@media (max-width: 768px) {
+  html,
+  body,
+  #root {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  #root > * {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .hero,
+  .hero-section,
+  .hero__inner,
+  .home-hero,
+  .home-hero__inner,
+  .category-section,
+  .featured-section,
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: none !important;
+  }
+
+  .hero,
+  .hero__inner,
+  .home-hero,
+  .home-hero__inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .hero > *,
+  .hero__inner > *,
+  .home-hero > *,
+  .home-hero__inner > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
