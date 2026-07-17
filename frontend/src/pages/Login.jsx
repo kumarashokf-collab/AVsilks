@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import { auth } from "../firebase";
 import logo from "../assets/logo.png";
+import { BRAND } from "../config/branding";
 
 const ADMIN_NUMBERS = [
   "+917729911578",
@@ -218,7 +219,7 @@ function Login() {
       >
         <img
           src={logo}
-          alt="AV Silks"
+          alt={BRAND.name}
           style={{
             width: "88px",
             height: "88px",
@@ -235,7 +236,7 @@ function Login() {
             lineHeight: 1.2
           }}
         >
-          Welcome to AV Silks
+          Welcome to {BRAND.name}
         </h1>
 
         <p
