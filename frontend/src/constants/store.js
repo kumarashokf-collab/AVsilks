@@ -6,12 +6,6 @@ export const STORE = {
   description:
     "Traditional and contemporary sarees selected with care for every celebration.",
 
-  contact: {
-    phone: "+91XXXXXXXXXX",
-    whatsapp: "91XXXXXXXXXX",
-    email: "support@avsilks.in"
-  },
-
   address: {
     line1: "AV Silks",
     city: "Your City",

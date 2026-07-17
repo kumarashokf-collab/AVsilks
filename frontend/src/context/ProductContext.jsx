@@ -62,6 +62,12 @@ function normalizeProduct(product = {}) {
       product.imageUrl ||
       ""
     ).trim(),
+    images: Array.isArray(product.images)
+      ? product.images
+          .map((url) => String(url || "").trim())
+          .filter(Boolean)
+          .slice(0, 5)
+      : [],
     featured: Boolean(product.featured),
     active:
       product.active === undefined

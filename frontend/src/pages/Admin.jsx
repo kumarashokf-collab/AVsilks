@@ -27,6 +27,9 @@ function Admin() {
   const [activeTab, setActiveTab] = useState("orders");
   const [newProduct, setNewProduct] = useState(EMPTY_PRODUCT);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImageFiles, setSelectedImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const {
     products = [],
@@ -48,6 +51,169 @@ function Admin() {
 
   function handleClear() {
     setNewProduct(EMPTY_PRODUCT);
+  }
+
+  function handleImageSlotChange(index, file) {
+    if (!file) {
+      return;
+    }
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ];
+
+    if (
+      file.size > 15 * 1024 * 1024 ||
+      !allowedTypes.includes(file.type)
+    ) {
+      alert(
+        "Image JPG, PNG లేదా WEBP formatలో 15MB కంటే తక్కువగా ఉండాలి."
+      );
+      return;
+    }
+
+    setSelectedImageFiles((currentFiles) => {
+      const nextFiles = [...currentFiles];
+      nextFiles[index] = file;
+      return nextFiles;
+    });
+
+    const previewUrl = URL.createObjectURL(file);
+
+    setImagePreviews((currentPreviews) => {
+      const nextPreviews = [...currentPreviews];
+      nextPreviews[index] = previewUrl;
+
+      if (index === 0) {
+        updateField("image", previewUrl);
+      }
+
+      return nextPreviews;
+    });
+
+    setUploadProgress(0);
+  }
+
+  function removeImageSlot(index) {
+    setSelectedImageFiles((currentFiles) => {
+      const nextFiles = [...currentFiles];
+      nextFiles[index] = undefined;
+      return nextFiles;
+    });
+
+    setImagePreviews((currentPreviews) => {
+      const nextPreviews = [...currentPreviews];
+      nextPreviews[index] = "";
+
+      if (index === 0) {
+        updateField("image", nextPreviews[1] || "");
+      }
+
+      return nextPreviews;
+    });
+  }
+
+  async function compressImage(file) {
+    const imageBitmap = await createImageBitmap(file);
+
+    const maxDimension = 1600;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(
+        imageBitmap.width,
+        imageBitmap.height
+      )
+    );
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(imageBitmap.width * scale);
+    canvas.height = Math.round(imageBitmap.height * scale);
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      throw new Error("Image compression failed.");
+    }
+
+    context.drawImage(
+      imageBitmap,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const compressedBlob = await new Promise(
+      (resolve, reject) => {
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(
+                new Error("Compressed image could not be created.")
+              );
+            }
+          },
+          "image/webp",
+          0.82
+        );
+      }
+    );
+
+    return new File(
+      [compressedBlob],
+      `${Date.now()}-avsilks.webp`,
+      {
+        type: "image/webp"
+      }
+    );
+  }
+
+  async function uploadImageToCloudinary(file) {
+    const cloudName =
+      import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+
+    const uploadPreset =
+      import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+    if (!cloudName || !uploadPreset) {
+      throw new Error(
+        "Cloudinary configuration missing."
+      );
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+    formData.append("folder", "avsilks/products");
+
+    setUploadProgress(20);
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    setUploadProgress(80);
+
+    const result = await response.json();
+
+    if (!response.ok || !result.secure_url) {
+      throw new Error(
+        result?.error?.message ||
+        "Image upload failed."
+      );
+    }
+
+    setUploadProgress(100);
+
+    return result.secure_url;
   }
 
   async function handleAdd(event) {
@@ -109,6 +275,31 @@ function Admin() {
             )
           : 0;
 
+      const uploadedImages = [];
+      const validImageFiles =
+        selectedImageFiles.filter(Boolean);
+
+      if (validImageFiles.length === 0) {
+        throw new Error(
+          "Main product image is required."
+        );
+      }
+
+      for (const file of validImageFiles) {
+        const compressedImage =
+          await compressImage(file);
+
+        const imageUrl =
+          await uploadImageToCloudinary(
+            compressedImage
+          );
+
+        uploadedImages.push(imageUrl);
+      }
+
+      const uploadedImageUrl =
+        uploadedImages[0] || "";
+
       const result = await addProduct({
         name,
         price,
@@ -118,7 +309,8 @@ function Admin() {
         stock,
         stockStatus: stock > 0 ? "In Stock" : "Out of Stock",
         sku,
-        image: newProduct.image.trim(),
+        image: uploadedImageUrl,
+        images: uploadedImages,
         offer: newProduct.offer.trim() || `${offerPercent}%`,
         featured: newProduct.featured,
         active: newProduct.active
@@ -130,6 +322,9 @@ function Admin() {
 
       alert("కొత్త చీర విజయవంతంగా యాడ్ చేయబడింది!");
       setNewProduct(EMPTY_PRODUCT);
+      setSelectedImageFiles([]);
+      setImagePreviews([]);
+      setUploadProgress(0);
     } catch (error) {
       console.error("Product add failed:", error);
       alert("Product add కాలేదు. మళ్లీ ప్రయత్నించండి.");
@@ -519,93 +714,105 @@ function Admin() {
                 />
               </label>
 
-              <label style={labelStyle}>
-                Add Image
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-
-                    if (!file) {
-                      return;
-                    }
-
-                    if (file.size > 5 * 1024 * 1024) {
-                      alert("Image size 5MB కంటే తక్కువగా ఉండాలి.");
-                      event.target.value = "";
-                      return;
-                    }
-
-                    const reader = new FileReader();
-
-                    reader.onload = () => {
-                      updateField("image", reader.result);
-                    };
-
-                    reader.onerror = () => {
-                      alert("Image చదవలేకపోయాం. మరో image ప్రయత్నించండి.");
-                    };
-
-                    reader.readAsDataURL(file);
-                  }}
-                  style={{
-                    ...fieldStyle,
-                    padding: "12px"
-                  }}
-                />
-                <small
-                  style={{
-                    color: "var(--color-text-muted)",
-                    fontWeight: 400
-                  }}
-                >
-                  JPG, PNG లేదా WEBP — గరిష్టంగా 5MB
-                </small>
-              </label>
-
-              {newProduct.image && (
-                <div
-                  style={{
-                    padding: "12px",
-                    border:
-                      "1px solid var(--color-border-light)",
-                    borderRadius: "var(--radius-sm)"
-                  }}
-                >
-                  <p
+              <div
+                style={{
+                  display: "grid",
+                  gap: "14px"
+                }}
+              >
+                <div>
+                  <strong
                     style={{
-                      marginBottom: "10px",
-                      fontWeight: 700
+                      display: "block",
+                      marginBottom: "6px"
                     }}
                   >
-                    Selected Image
-                  </p>
+                    Product Images
+                  </strong>
 
-                  <img
-                    src={newProduct.image}
-                    alt="Product preview"
+                  <small
                     style={{
-                      width: "100%",
-                      maxWidth: "220px",
-                      aspectRatio: "3 / 4",
-                      objectFit: "cover",
-                      borderRadius: "10px"
-                    }}
-                  />
-
-                  <button
-                    type="button"
-                    className="btn btn--ghost"
-                    onClick={() => updateField("image", "")}
-                    style={{
-                      marginTop: "12px"
+                      color: "var(--color-text-muted)"
                     }}
                   >
-                    Remove Image
-                  </button>
+                    Main imageతో కలిపి గరిష్టంగా 5 photos.
+                    ప్రతి image 15MB లోపు ఉండాలి;
+                    upload ముందు auto-compress అవుతుంది.
+                  </small>
                 </div>
-              )}
+
+                {[0, 1, 2, 3, 4].map((slotIndex) => (
+                  <div
+                    key={slotIndex}
+                    style={{
+                      padding: "12px",
+                      border:
+                        "1px solid var(--color-border-light)",
+                      borderRadius: "var(--radius-sm)",
+                      display: "grid",
+                      gap: "10px"
+                    }}
+                  >
+                    <label style={labelStyle}>
+                      {slotIndex === 0
+                        ? "Main Image *"
+                        : `Gallery Image ${slotIndex + 1}`}
+
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(event) => {
+                          const file =
+                            event.target.files?.[0];
+
+                          handleImageSlotChange(
+                            slotIndex,
+                            file
+                          );
+                        }}
+                        style={{
+                          ...fieldStyle,
+                          padding: "12px"
+                        }}
+                      />
+                    </label>
+
+                    {imagePreviews[slotIndex] && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          flexWrap: "wrap"
+                        }}
+                      >
+                        <img
+                          src={imagePreviews[slotIndex]}
+                          alt={`Product preview ${
+                            slotIndex + 1
+                          }`}
+                          style={{
+                            width: "100px",
+                            aspectRatio: "3 / 4",
+                            objectFit: "cover",
+                            borderRadius: "10px"
+                          }}
+                        />
+
+                        <button
+                          type="button"
+                          className="btn btn--ghost"
+                          onClick={() =>
+                            removeImageSlot(slotIndex)
+                          }
+                        >
+                          Remove Image
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
 
               <div
                 style={{

@@ -110,7 +110,7 @@ function Checkout() {
     return "";
   }
 
-  function handlePlaceOrder() {
+  async function handlePlaceOrder() {
     const validationError = validateForm();
 
     if (validationError) {
@@ -126,7 +126,7 @@ function Checkout() {
         JSON.stringify(form)
       );
 
-      const newOrder = placeOrder({
+      const newOrder = await placeOrder({
         customer: {
           name: form.name.trim(),
           phone: form.phone.trim(),

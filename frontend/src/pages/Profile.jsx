@@ -1,277 +1,263 @@
-import { useState } from "react";
-import { FaBoxOpen, FaShoppingBag } from "react-icons/fa";
+import {
+  FaCamera,
+  FaEnvelope,
+  FaHeadset,
+  FaIdCard,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaUser
+} from "react-icons/fa";
 
-import { useOrders } from "../context/OrderContext";
-import { useCart } from "../context/CartContext";
-import OrderCard from "../components/orders/OrderCard";
+import { BRAND } from "../config/branding";
+import { CONTACT } from "../config/contact";
 
-function Profile() {
-  const { orders, updateOrderStatus } = useOrders();
-  const { addToCart } = useCart();
+function Profile({ user }) {
+  const displayName =
+    user?.displayName ||
+    `${BRAND.name} Customer`;
 
-  const [cancelOrderId, setCancelOrderId] =
-    useState(null);
+  const phoneNumber =
+    user?.phoneNumber ||
+    "Phone number not available";
 
-  const [cancelReason, setCancelReason] =
-    useState("");
-
-  function handleOpenCancel(orderId) {
-    setCancelOrderId(orderId);
-    setCancelReason("");
-  }
-
-  function handleCloseCancel() {
-    setCancelOrderId(null);
-    setCancelReason("");
-  }
-
-  function handleConfirmCancel() {
-    if (!cancelReason.trim()) {
-      alert("దయచేసి cancel reason నమోదు చేయండి.");
-      return;
-    }
-
-    updateOrderStatus(
-      cancelOrderId,
-      "Cancelled",
-      cancelReason.trim()
-    );
-
-    handleCloseCancel();
-  }
-
-  function handleReorder(order) {
-    const items = Array.isArray(order?.items)
-      ? order.items
-      : [];
-
-    if (items.length === 0) {
-      alert("ఈ orderలో product details లేవు.");
-      return;
-    }
-
-    items.forEach((item) => {
-      addToCart(item, item.quantity || 1);
-    });
-
-    alert("Order items cartలోకి add అయ్యాయి.");
-  }
+  const email =
+    user?.email ||
+    "Email not added";
 
   return (
     <main
       style={{
         minHeight: "100vh",
-        padding: "32px 0 64px",
+        padding: "32px 0 72px",
         background: "var(--color-cream-50)"
       }}
     >
       <div
         className="container"
         style={{
-          maxWidth: "900px"
+          maxWidth: "760px"
         }}
       >
         <header
           style={{
-            marginBottom: "28px",
-            textAlign: "center"
+            textAlign: "center",
+            marginBottom: "26px"
           }}
         >
           <p className="section__eyebrow">
             Your Account
           </p>
 
-          <h1
-            style={{
-              marginBottom: "8px"
-            }}
-          >
-            My Orders
+          <h1 style={{ marginBottom: "8px" }}>
+            My Profile
           </h1>
 
           <p
             style={{
-              marginBottom: 0,
+              margin: 0,
               color: "var(--color-text-secondary)"
             }}
           >
-            మీ orders, payment మరియు delivery statusను
+            మీ account మరియు customer వివరాలను
             ఇక్కడ చూడవచ్చు.
           </p>
         </header>
 
-        {orders.length === 0 ? (
-          <section
-            className="card"
+        <section
+          className="card"
+          style={{
+            padding: "24px",
+            display: "grid",
+            gap: "22px"
+          }}
+        >
+          <div
             style={{
-              minHeight: "340px",
-              padding: "32px",
               display: "grid",
-              placeItems: "center",
-              alignContent: "center",
-              textAlign: "center"
+              justifyItems: "center",
+              gap: "12px"
             }}
           >
             <div
               style={{
-                width: "76px",
-                height: "76px",
-                marginBottom: "18px",
+                width: "96px",
+                height: "96px",
                 borderRadius: "50%",
                 display: "grid",
                 placeItems: "center",
                 background: "var(--color-gold-100)",
                 color: "var(--color-wine-800)",
-                fontSize: "28px"
+                fontSize: "36px",
+                position: "relative"
               }}
             >
-              <FaBoxOpen />
-            </div>
-
-            <h2>No orders yet</h2>
-
-            <p
-              style={{
-                maxWidth: "420px",
-                color: "var(--color-text-secondary)"
-              }}
-            >
-              మీకు నచ్చిన చీరలను cartలో add చేసి మొదటి
-              order place చేయండి.
-            </p>
-
-            <a
-              href="/#featured-products"
-              className="btn btn--primary"
-            >
-              <FaShoppingBag />
-              Start Shopping
-            </a>
-          </section>
-        ) : (
-          <section
-            style={{
-              display: "grid",
-              gap: "20px"
-            }}
-          >
-            {orders.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onCancel={handleOpenCancel}
-                onReorder={handleReorder}
-              />
-            ))}
-          </section>
-        )}
-      </div>
-
-      {cancelOrderId ? (
-        <div
-          role="presentation"
-          onClick={handleCloseCancel}
-          style={{
-            position: "fixed",
-            zIndex: 3000,
-            inset: 0,
-            padding: "20px",
-            display: "grid",
-            placeItems: "center",
-            background: "rgba(23,17,15,0.58)"
-          }}
-        >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cancel-order-title"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-            className="card"
-            style={{
-              width: "min(100%, 460px)",
-              padding: "24px"
-            }}
-          >
-            <h2
-              id="cancel-order-title"
-              style={{
-                marginBottom: "10px"
-              }}
-            >
-              Cancel Order
-            </h2>
-
-            <p
-              style={{
-                color: "var(--color-text-secondary)"
-              }}
-            >
-              Order ID: <strong>{cancelOrderId}</strong>
-            </p>
-
-            <label
-              htmlFor="cancelReason"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: 800
-              }}
-            >
-              Cancel Reason
-            </label>
-
-            <textarea
-              id="cancelReason"
-              value={cancelReason}
-              onChange={(event) =>
-                setCancelReason(event.target.value)
-              }
-              placeholder="ఉదాహరణ: తప్పు product ఎంపిక చేశాను"
-              rows={4}
-              style={{
-                width: "100%",
-                padding: "12px",
-                border:
-                  "1px solid var(--color-border-medium)",
-                borderRadius: "var(--radius-md)",
-                resize: "vertical"
-              }}
-            />
-
-            <div
-              style={{
-                marginTop: "18px",
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "12px"
-              }}
-            >
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={handleCloseCancel}
-              >
-                Keep Order
-              </button>
+              <FaUser />
 
               <button
                 type="button"
-                className="btn"
-                onClick={handleConfirmCancel}
+                aria-label="Add profile photo"
                 style={{
-                  background: "var(--color-danger)",
+                  position: "absolute",
+                  right: "-4px",
+                  bottom: "2px",
+                  width: "34px",
+                  height: "34px",
+                  borderRadius: "50%",
+                  border: "2px solid white",
+                  display: "grid",
+                  placeItems: "center",
+                  background: "var(--color-wine-800)",
                   color: "white"
                 }}
               >
-                Confirm Cancel
+                <FaCamera size={14} />
               </button>
             </div>
-          </section>
-        </div>
-      ) : null}
+
+            <div style={{ textAlign: "center" }}>
+              <h2 style={{ marginBottom: "4px" }}>
+                {displayName}
+              </h2>
+
+              <small
+                style={{
+                  color: "var(--color-text-secondary)"
+                }}
+              >
+                {BRAND.name} Customer
+              </small>
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gap: "14px"
+            }}
+          >
+            <ProfileRow
+              icon={<FaPhone />}
+              label="Phone Number"
+              value={phoneNumber}
+            />
+
+            <ProfileRow
+              icon={<FaEnvelope />}
+              label="Email"
+              value={email}
+            />
+
+            <ProfileRow
+              icon={<FaIdCard />}
+              label="Customer ID"
+              value={user?.uid || "Not available"}
+            />
+
+            <ProfileRow
+              icon={<FaMapMarkerAlt />}
+              label="Default Address"
+              value="No saved address yet"
+            />
+
+            <ProfileRow
+              icon={<FaHeadset />}
+              label="Support Phone"
+              value={CONTACT.phone}
+            />
+
+            <ProfileRow
+              icon={<FaEnvelope />}
+              label="Support Email"
+              value={CONTACT.email}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: "12px"
+            }}
+          >
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() =>
+                alert(
+                  "Edit Profile feature తదుపరి stepలో add చేస్తాం."
+                )
+              }
+            >
+              Edit Profile
+            </button>
+
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() =>
+                alert(
+                  "Manage Addresses feature తదుపరి stepలో add చేస్తాం."
+                )
+              }
+            >
+              Manage Addresses
+            </button>
+          </div>
+        </section>
+      </div>
     </main>
+  );
+}
+
+function ProfileRow({
+  icon,
+  label,
+  value
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "14px",
+        padding: "15px",
+        border:
+          "1px solid var(--color-border-light)",
+        borderRadius: "var(--radius-sm)",
+        background: "#fff"
+      }}
+    >
+      <span
+        style={{
+          color: "var(--color-wine-800)",
+          fontSize: "18px",
+          marginTop: "2px"
+        }}
+      >
+        {icon}
+      </span>
+
+      <div>
+        <small
+          style={{
+            display: "block",
+            marginBottom: "4px",
+            color: "var(--color-text-secondary)"
+          }}
+        >
+          {label}
+        </small>
+
+        <strong
+          style={{
+            wordBreak: "break-word"
+          }}
+        >
+          {value}
+        </strong>
+      </div>
+    </div>
   );
 }
 
