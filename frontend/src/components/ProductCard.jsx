@@ -10,6 +10,7 @@ import {
 
 import { useCart } from "../context/CartContext";
 import "./ProductCard.css";
+import { BRAND } from "../config/branding";
 
 const FALLBACK_IMAGE =
   "data:image/svg+xml;charset=UTF-8," +
@@ -18,7 +19,7 @@ const FALLBACK_IMAGE =
       <rect width="600" height="750" fill="#f7f1ec"/>
       <rect x="45" y="45" width="510" height="660" rx="24" fill="#fffaf6" stroke="#d7c3b5" stroke-width="4"/>
       <text x="300" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="44" fill="#6b2d2d">
-        AV Silks
+        ${BRAND.name}
       </text>
       <text x="300" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" fill="#8b6f63">
         Product image coming soon
@@ -48,7 +49,7 @@ export default function ProductCard({ product }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const productName = product?.name?.trim() || "AV Silks Saree";
+  const productName = product?.name?.trim() || `${BRAND.name} Saree`;
   const category = product?.category?.trim() || "Saree";
 
   const originalPrice = getSafePrice(
@@ -102,7 +103,7 @@ export default function ProductCard({ product }) {
 
     const shareData = {
       title: productName,
-      text: `Check out ${productName} at AV Silks`,
+      text: `Check out ${productName} at ${BRAND.name}`,
       url: `${window.location.origin}/product/${product?.id || ""}`
     };
 
