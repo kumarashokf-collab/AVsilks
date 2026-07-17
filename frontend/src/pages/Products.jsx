@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import SearchAI from "../components/SearchAI";
 import { useProducts } from "../context/ProductContext";
@@ -8,6 +9,32 @@ function Products() {
     loading,
     error
   } = useProducts();
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return products;
+    }
+
+    return products.filter((product) => {
+      const searchableText = [
+        product?.name,
+        product?.category,
+        product?.description,
+        product?.sku,
+        product?.color,
+        product?.fabric
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(query);
+    });
+  }, [products, searchQuery]);
 
   return (
     <main
@@ -51,7 +78,7 @@ function Products() {
             background: "var(--color-cream-50)"
           }}
         >
-          <SearchAI />
+          <SearchAI onSearchChange={setSearchQuery} />
         </div>
 
         {loading ? (
@@ -74,9 +101,9 @@ function Products() {
           >
             {error}
           </div>
-        ) : products.length > 0 ? (
+        ) : filteredProducts.length > 0 ? (
           <div className="home-products__grid">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -91,7 +118,7 @@ function Products() {
               textAlign: "center"
             }}
           >
-            ప్రస్తుతం products లేవు.
+            {searchQuery ? `"${searchQuery}"కు సరిపోయే చీరలు లేవు.` : "ప్రస్తుతం products లేవు."}
           </div>
         )}
       </div>
