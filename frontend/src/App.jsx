@@ -46,7 +46,7 @@ function App() {
 
   if (authLoading) {
     return (
-      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "#fffaf7", color: "#6b2525", fontFamily: "Arial, sans-serif" }}>
+      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "var(--color-cream-50)", color: "var(--color-wine-800)", fontFamily: "var(--font-family-body)" }}>
         <div style={{ textAlign: "center" }}>
           <strong style={{ fontSize: "20px" }}>AV Silks</strong>
           <p style={{ marginTop: "8px" }}>Loading...</p>
