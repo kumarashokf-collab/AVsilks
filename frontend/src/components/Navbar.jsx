@@ -5,6 +5,7 @@ import {
   FaTimes,
   FaHome,
   FaShoppingBag,
+  FaBoxOpen,
   FaUser,
   FaCog,
   FaUserShield,
@@ -17,6 +18,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useCart } from "../context/CartContext";
 import { STORE } from "../constants/store";
+import { BRAND } from "../config/branding";
 import { isAdminUser } from "../constants/admin";
 import logo from "../assets/logo.png";
 import "./Navbar.css";
@@ -84,7 +86,7 @@ function Navbar({ user }) {
           <Link
             to="/"
             className="site-header__brand"
-            aria-label={`${STORE.name} home`}
+            aria-label={`${BRAND.name} home`}
           >
             <img
               src={logo}
@@ -93,8 +95,8 @@ function Navbar({ user }) {
             />
 
             <span className="site-header__brand-text">
-              <strong>{STORE.name}</strong>
-              <small>{STORE.tagline}</small>
+              <strong>{BRAND.name}</strong>
+              <small>{BRAND.tagline}</small>
             </span>
           </Link>
 
@@ -168,8 +170,8 @@ function Navbar({ user }) {
           >
             <img src={logo} alt="" />
             <div>
-              <strong>{STORE.name}</strong>
-              <small>{STORE.tagline}</small>
+              <strong>{BRAND.name}</strong>
+              <small>{BRAND.tagline}</small>
             </div>
           </Link>
 
@@ -192,7 +194,7 @@ function Navbar({ user }) {
             <strong>
               {user?.displayName ||
                 user?.phoneNumber ||
-                "Welcome to AV Silks"}
+                 `Welcome to ${BRAND.name}` }
             </strong>
 
             <span>
@@ -223,6 +225,11 @@ function Navbar({ user }) {
               <Link to="/profile" onClick={closeDrawer}>
                 <FaUser />
                 <span>My Profile</span>
+              </Link>
+
+              <Link to="/orders" onClick={closeDrawer}>
+                <FaBoxOpen />
+                <span>My Orders</span>
               </Link>
 
               <Link to="/settings" onClick={closeDrawer}>
@@ -275,12 +282,12 @@ function Navbar({ user }) {
               onClick={closeDrawer}
             >
               <FaSignInAlt />
-              Login to AV Silks
+              Login to {BRAND.name}
             </Link>
           )}
 
           <small>
-            © {new Date().getFullYear()} {STORE.name}
+            {BRAND.copyright}
           </small>
         </div>
       </aside>

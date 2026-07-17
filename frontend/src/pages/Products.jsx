@@ -1,0 +1,102 @@
+import ProductCard from "../components/ProductCard";
+import SearchAI from "../components/SearchAI";
+import { useProducts } from "../context/ProductContext";
+
+function Products() {
+  const {
+    products = [],
+    loading,
+    error
+  } = useProducts();
+
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        padding: "24px 0 72px",
+        background: "var(--color-cream-50)"
+      }}
+    >
+      <div className="container">
+        <header
+          style={{
+            marginBottom: "22px",
+            textAlign: "center"
+          }}
+        >
+          <p className="section__eyebrow">
+            AV Silks Collection
+          </p>
+
+          <h1 style={{ marginBottom: "8px" }}>
+            All Sarees
+          </h1>
+
+          <p
+            style={{
+              margin: 0,
+              color: "var(--color-text-secondary)"
+            }}
+          >
+            మా పూర్తి saree collectionను ఇక్కడ చూడండి.
+          </p>
+        </header>
+
+        <div
+          style={{
+            position: "sticky",
+            top: "68px",
+            zIndex: 80,
+            padding: "8px 0 14px",
+            background: "var(--color-cream-50)"
+          }}
+        >
+          <SearchAI />
+        </div>
+
+        {loading ? (
+          <div
+            className="card"
+            style={{
+              padding: "32px",
+              textAlign: "center"
+            }}
+          >
+            Products loading...
+          </div>
+        ) : error ? (
+          <div
+            className="card"
+            style={{
+              padding: "32px",
+              textAlign: "center"
+            }}
+          >
+            {error}
+          </div>
+        ) : products.length > 0 ? (
+          <div className="home-products__grid">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            className="card"
+            style={{
+              padding: "32px",
+              textAlign: "center"
+            }}
+          >
+            ప్రస్తుతం products లేవు.
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default Products;

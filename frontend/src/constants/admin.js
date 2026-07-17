@@ -1,8 +1,11 @@
-export const ADMIN_PHONE = "+919999990001";
+export const ADMIN_PHONES = [
+  "+917729911578",
+  "+919999999991"
+];
 
 export function isAdminUser(user) {
   return Boolean(
     user?.phoneNumber &&
-    user.phoneNumber === ADMIN_PHONE
+    ADMIN_PHONES.includes(user.phoneNumber)
   );
 }

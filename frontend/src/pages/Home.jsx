@@ -11,33 +11,49 @@ function Home() {
 
   return (
     <main className="home-page">
-      <HeroSection />
-      <CategorySection />
+      <div className="home-search">
+        <SearchAI />
+      </div>
 
       <section
         id="featured-products"
-        className="section home-products"
+        className="section home-products home-products--first"
       >
         <div className="container">
           <SectionHeader
-            eyebrow="Our Collection"
+            eyebrow="Shop Now"
             title="Featured Sarees"
-            description="Explore handpicked sarees selected for celebrations, weddings and everyday elegance."
+            description="మీకు నచ్చిన తాజా చీరలను వెంటనే చూడండి."
           />
 
-          <div className="home-products__search">
-            <SearchAI />
-          </div>
-
           {products.length > 0 ? (
-            <div className="home-products__grid">
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                />
-              ))}
-            </div>
+            <>
+              <div className="home-products__grid">
+                {products
+                  .slice(0, 6)
+                  .map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                    />
+                  ))}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "24px"
+                }}
+              >
+                <a
+                  href="/products"
+                  className="btn btn--primary"
+                >
+                  View All Products →
+                </a>
+              </div>
+            </>
           ) : (
             <div className="home-products__empty card">
               <h3>Products are being prepared</h3>
@@ -48,6 +64,9 @@ function Home() {
           )}
         </div>
       </section>
+
+      <CategorySection />
+      <HeroSection />
     </main>
   );
 }

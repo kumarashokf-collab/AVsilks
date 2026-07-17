@@ -2,11 +2,26 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState
 } from "react";
 
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where
+} from "firebase/firestore";
+
+import { db } from "../firebase";
+import { isAdminUser } from "../constants/admin";
+
 const OrderContext = createContext(null);
-const STORAGE_KEY = "av_orders";
 
 export function useOrders() {
   const context = useContext(OrderContext);
@@ -20,89 +35,110 @@ export function useOrders() {
   return context;
 }
 
-function readStoredOrders() {
-  try {
-    const savedOrders =
-      localStorage.getItem(STORAGE_KEY);
-
-    const parsedOrders = savedOrders
-      ? JSON.parse(savedOrders)
-      : [];
-
-    return Array.isArray(parsedOrders)
-      ? parsedOrders
-      : [];
-  } catch (error) {
-    console.warn(
-      "Unable to read saved orders:",
-      error
-    );
-
-    return [];
-  }
-}
-
-function createOrderId() {
-  const timestamp = Date.now();
-  const randomPart = Math.floor(
-    1000 + Math.random() * 9000
-  );
-
-  return `ORD${timestamp}${randomPart}`;
-}
-
 function normalizeItems(items) {
   if (!Array.isArray(items)) {
     return [];
   }
 
   return items.map((item) => ({
-    id: item?.id || "",
-    name: item?.name || "AV Silks Saree",
+    id: String(item?.id || ""),
+    name: String(
+      item?.name || "AV Silks Saree"
+    ),
     price: Number(item?.price || 0),
     quantity: Math.max(
       1,
       Number(item?.quantity || 1)
     ),
-    image:
+    image: String(
       item?.image ||
       item?.imageUrl ||
-      "",
-    sku: item?.sku || "",
-    category: item?.category || ""
+      ""
+    ),
+    images: Array.isArray(item?.images)
+      ? item.images.filter(Boolean).slice(0, 5)
+      : [],
+    sku: String(item?.sku || ""),
+    category: String(item?.category || "")
   }));
 }
 
-export function OrderProvider({ children }) {
-  const [orders, setOrders] =
-    useState(readStoredOrders);
+export function OrderProvider({
+  user,
+  children
+}) {
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] =
+    useState(true);
+  const [ordersError, setOrdersError] =
+    useState("");
+
+  const admin = useMemo(
+    () => isAdminUser(user),
+    [user]
+  );
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(orders)
-      );
-    } catch (error) {
-      console.warn(
-        "Unable to save orders:",
-        error
+    if (!user) {
+      setOrders([]);
+      setOrdersLoading(false);
+      setOrdersError("");
+      return;
+    }
+
+    setOrdersLoading(true);
+
+    const ordersRef = collection(db, "orders");
+
+    const ordersQuery = admin
+      ? query(
+          ordersRef,
+          orderBy("createdAt", "desc")
+        )
+      : query(
+          ordersRef,
+          where("userId", "==", user.uid),
+          orderBy("createdAt", "desc")
+        );
+
+    const unsubscribe = onSnapshot(
+      ordersQuery,
+      (snapshot) => {
+        const nextOrders = snapshot.docs.map(
+          (orderDoc) => ({
+            id: orderDoc.id,
+            ...orderDoc.data()
+          })
+        );
+
+        setOrders(nextOrders);
+        setOrdersError("");
+        setOrdersLoading(false);
+      },
+      (error) => {
+        console.error(
+          "Firestore orders load failed:",
+          error
+        );
+
+        setOrdersError(
+          error?.message ||
+          "Orders load కాలేదు."
+        );
+        setOrdersLoading(false);
+      }
+    );
+
+    return unsubscribe;
+  }, [user, admin]);
+
+  async function placeOrder(orderData = {}) {
+    if (!user) {
+      throw new Error(
+        "Order place చేయడానికి login అవసరం."
       );
     }
-  }, [orders]);
 
-  function sendNotification(title, body) {
-    if (
-      typeof Notification !== "undefined" &&
-      Notification.permission === "granted"
-    ) {
-      new Notification(title, {
-        body
-      });
-    }
-  }
-
-  function placeOrder(orderData = {}) {
     const items = normalizeItems(
       orderData.items
     );
@@ -114,28 +150,28 @@ export function OrderProvider({ children }) {
     }
 
     const customer = {
-      name:
-        orderData.customer?.name?.trim() ||
-        "",
-      phone:
-        orderData.customer?.phone?.trim() ||
-        "",
+      name: String(
+        orderData.customer?.name || ""
+      ).trim(),
+      phone: String(
+        orderData.customer?.phone || ""
+      ).trim(),
       address: {
-        house:
-          orderData.customer?.address?.house?.trim() ||
-          "",
-        street:
-          orderData.customer?.address?.street?.trim() ||
-          "",
-        city:
-          orderData.customer?.address?.city?.trim() ||
-          "",
-        state:
-          orderData.customer?.address?.state?.trim() ||
-          "",
-        pin:
-          orderData.customer?.address?.pin?.trim() ||
-          ""
+        house: String(
+          orderData.customer?.address?.house || ""
+        ).trim(),
+        street: String(
+          orderData.customer?.address?.street || ""
+        ).trim(),
+        city: String(
+          orderData.customer?.address?.city || ""
+        ).trim(),
+        state: String(
+          orderData.customer?.address?.state || ""
+        ).trim(),
+        pin: String(
+          orderData.customer?.address?.pin || ""
+        ).trim()
       }
     };
 
@@ -162,93 +198,83 @@ export function OrderProvider({ children }) {
       .map((item) => item.name)
       .join(", ");
 
-    const now = new Date();
-
-    const newOrder = {
-      id: createOrderId(),
-
+    const orderPayload = {
+      userId: user.uid,
+      userPhone: user.phoneNumber || "",
       customer,
       customerName: customer.name,
       customerPhone: customer.phone,
-
       product: productLabel,
       items,
-
       subtotal,
       shippingCharge,
       total,
       price: total,
-
       payment:
         orderData.payment ||
         "Cash on Delivery",
-
       paymentStatus:
         orderData.paymentStatus ||
         "Pending on Delivery",
-
       status: "Processing",
-
-      date: now.toLocaleDateString(
-        "en-IN"
-      ),
-
-      createdAt: now.toISOString(),
-
+      cancelReason: "",
       statusHistory: [
         {
           status: "Processing",
-          date: now.toISOString(),
+          date: new Date().toISOString(),
           note: "Order placed successfully"
         }
-      ]
+      ],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     };
 
-    setOrders((currentOrders) => [
-      newOrder,
-      ...currentOrders
-    ]);
+    const orderRef = await addDoc(
+      collection(db, "orders"),
+      orderPayload
+    );
 
-    return newOrder;
+    return {
+      id: orderRef.id,
+      ...orderPayload
+    };
   }
 
-  function updateOrderStatus(
+  async function updateOrderStatus(
     id,
     newStatus,
     reason = ""
   ) {
-    setOrders((currentOrders) =>
-      currentOrders.map((order) => {
-        if (order.id !== id) {
-          return order;
-        }
+    if (!admin) {
+      throw new Error(
+        "Only admin can update order status."
+      );
+    }
 
-        const now = new Date();
+    const currentOrder = orders.find(
+      (order) => order.id === id
+    );
 
-        sendNotification(
-          "AV Silks Update",
-          `మీ ఆర్డర్ ${order.product} స్టేటస్ ${newStatus}కి మారింది.`
-        );
+    const currentHistory =
+      Array.isArray(currentOrder?.statusHistory)
+        ? currentOrder.statusHistory
+        : [];
 
-        return {
-          ...order,
-          status: newStatus,
-          cancelReason: reason,
-          updatedAt: now.toISOString(),
-          statusHistory: [
-            ...(Array.isArray(
-              order.statusHistory
-            )
-              ? order.statusHistory
-              : []),
-            {
-              status: newStatus,
-              date: now.toISOString(),
-              note: reason
-            }
-          ]
-        };
-      })
+    await updateDoc(
+      doc(db, "orders", id),
+      {
+        status: newStatus,
+        cancelReason: reason,
+        updatedAt: serverTimestamp(),
+        statusHistory: [
+          ...currentHistory,
+          {
+            status: newStatus,
+            date: new Date().toISOString(),
+            note: reason
+          }
+        ]
+      }
     );
   }
 
@@ -258,6 +284,8 @@ export function OrderProvider({ children }) {
 
   const value = {
     orders,
+    ordersLoading,
+    ordersError,
     placeOrder,
     updateOrderStatus,
     clearOrders
