@@ -19,6 +19,7 @@ import { CartProvider } from "./context/CartContext";
 import { ProductProvider } from "./context/ProductContext";
 import { OrderProvider } from "./context/OrderContext";
 import { isAdminUser } from "./constants/admin";
+import { BRAND } from "./config/branding";
 
 function RequireAuth({ user, children }) {
   if (!user) { return <Navigate to="/login" replace />; }
@@ -48,7 +49,7 @@ function App() {
     return (
       <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "var(--color-cream-50)", color: "var(--color-wine-800)", fontFamily: "var(--font-family-body)" }}>
         <div style={{ textAlign: "center" }}>
-          <strong style={{ fontSize: "20px" }}>AV Silks</strong>
+          <strong style={{ fontSize: "20px" }}>{BRAND.name}</strong>
           <p style={{ marginTop: "8px" }}>Loading...</p>
         </div>
       </div>
