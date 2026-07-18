@@ -115,6 +115,8 @@ function ProductDetails() {
               "https://via.placeholder.com/400x500?text=No+Image"
             }
             alt={product.name}
+            loading="eager"
+            decoding="async"
             onClick={() => setIsZoomOpen(true)}
             style={{
               width: "100%",
@@ -163,6 +165,8 @@ function ProductDetails() {
                 <img
                   src={imageUrl}
                   alt={`${product.name} ${index + 1}`}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     width: "100%",
                     height: "100%",
@@ -263,6 +267,7 @@ function ProductDetails() {
               "https://via.placeholder.com/400x500?text=No+Image"
             }
             alt={`${product.name} zoom`}
+            decoding="async"
             onClick={(event) => event.stopPropagation()}
             style={{
               width: "100%",

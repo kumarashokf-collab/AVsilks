@@ -220,6 +220,8 @@ function Login() {
         <img
           src={logo}
           alt={BRAND.name}
+          loading="eager"
+          decoding="async"
           style={{
             width: "88px",
             height: "88px",

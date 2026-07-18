@@ -93,6 +93,8 @@ function OrderCard({
           src={normalized.image}
           alt={normalized.title}
           onError={handleImageError}
+          loading="lazy"
+          decoding="async"
           className="order-card__image"
         />
 

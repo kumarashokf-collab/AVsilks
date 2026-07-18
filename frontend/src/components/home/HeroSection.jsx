@@ -44,6 +44,8 @@ function HeroSection() {
             <img
               src={heroImage}
               alt="AV Silks traditional saree collection"
+              loading="lazy"
+              decoding="async"
               className="hero__image"
             />
 
