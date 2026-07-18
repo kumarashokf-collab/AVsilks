@@ -105,6 +105,8 @@ function Cart() {
                   src={item.image || FALLBACK_IMAGE}
                   alt={item.name}
                   onError={handleImageError}
+                  loading="lazy"
+                  decoding="async"
                   className="cart-item__image"
                 />
 

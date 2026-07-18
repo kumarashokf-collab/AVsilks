@@ -791,6 +791,8 @@ function Admin() {
                           alt={`Product preview ${
                             slotIndex + 1
                           }`}
+                          loading="lazy"
+                          decoding="async"
                           style={{
                             width: "100px",
                             aspectRatio: "3 / 4",
@@ -942,6 +944,8 @@ function Admin() {
                         <img
                           src={product.image}
                           alt={product.name}
+                          loading="lazy"
+                          decoding="async"
                           style={{
                             width: "100%",
                             height: "100%",

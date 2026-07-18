@@ -147,6 +147,7 @@ export default function ProductCard({ product }) {
           alt={productName}
           onError={handleImageError}
           loading="lazy"
+          decoding="async"
           className="premium-product-card__image"
         />
 

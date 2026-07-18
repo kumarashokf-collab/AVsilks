@@ -165,6 +165,8 @@ function OrderDetails() {
                             item.name ||
                             "AV Silks product"
                           }
+                          loading="lazy"
+                          decoding="async"
                           onError={handleImageError}
                         />
 

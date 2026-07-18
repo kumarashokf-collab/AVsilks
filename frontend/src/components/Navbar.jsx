@@ -92,6 +92,8 @@ function Navbar({ user }) {
               src={logo}
               className="site-header__logo"
               alt=""
+              loading="eager"
+              decoding="async"
             />
 
             <span className="site-header__brand-text">
@@ -168,7 +170,12 @@ function Navbar({ user }) {
             className="nav-drawer__brand"
             onClick={closeDrawer}
           >
-            <img src={logo} alt="" />
+            <img
+              src={logo}
+              alt=""
+              loading="eager"
+              decoding="async"
+            />
             <div>
               <strong>{BRAND.name}</strong>
               <small>{BRAND.tagline}</small>
