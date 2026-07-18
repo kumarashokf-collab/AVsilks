@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import Cart from "./pages/Cart";
-import Profile from "./pages/Profile";
-import MyOrders from "./pages/MyOrders";
-import Settings from "./pages/Settings";
-import Login from "./pages/Login";
-import Admin from "./pages/Admin";
-import Checkout from "./pages/Checkout";
-import ProductDetails from "./pages/ProductDetails";
-import Products from "./pages/Products";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import OrderDetails from "./pages/orders/OrderDetails";
+const Home = lazy(() => import("./pages/Home"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Profile = lazy(() => import("./pages/Profile"));
+const MyOrders = lazy(() => import("./pages/MyOrders"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Login = lazy(() => import("./pages/Login"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const Products = lazy(() => import("./pages/Products"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const OrderDetails = lazy(() => import("./pages/orders/OrderDetails"));
 import { CartProvider } from "./context/CartContext";
 import { ProductProvider } from "./context/ProductContext";
 import { OrderProvider } from "./context/OrderContext";
@@ -62,8 +62,22 @@ function App() {
         <CartProvider>
           <Router>
             <Navbar user={user} />
-            <Routes>
-              <Route path="/" element={<Home />} />
+            <Suspense
+              fallback={
+                <div
+                  style={{
+                    minHeight: "50vh",
+                    display: "grid",
+                    placeItems: "center",
+                    color: "var(--color-wine-800)"
+                  }}
+                >
+                  Loading page...
+                </div>
+              }
+            >
+              <Routes>
+                <Route path="/" element={<Home />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/products" element={<Products />} />
               <Route path="/cart" element={<Cart />} />
@@ -75,8 +89,9 @@ function App() {
               <Route path="/profile" element={<RequireAuth user={user}><Profile user={user} /></RequireAuth>} />
               <Route path="/settings" element={<RequireAuth user={user}><Settings /></RequireAuth>} />
               <Route path="/admin" element={<RequireAdmin user={user}><Admin /></RequireAdmin>} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </Router>
         </CartProvider>
       </ProductProvider>
