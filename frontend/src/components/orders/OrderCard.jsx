@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 
 import OrderStatusBadge from "./OrderStatusBadge";
+import { formatOrderDate } from "../../utils/formatOrderDate";
 import "./orders.css";
 
 const FALLBACK_IMAGE =
@@ -34,7 +35,7 @@ function normalizeOrder(order) {
 
   return {
     id: order?.id || "Unknown Order",
-    date: order?.date || "Date unavailable",
+    date: formatOrderDate(order),
     status: order?.status || "Processing",
     payment: order?.payment || "Cash on Delivery",
     total: Number(order?.price || order?.total || 0),

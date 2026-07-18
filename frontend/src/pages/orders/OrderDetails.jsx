@@ -12,6 +12,7 @@ import { useOrders } from "../../context/OrderContext";
 import { useCart } from "../../context/CartContext";
 import OrderStatusBadge from "../../components/orders/OrderStatusBadge";
 import "../../components/orders/orders.css";
+import { formatOrderDate } from "../../utils/formatOrderDate";
 
 const FALLBACK_IMAGE =
   "data:image/svg+xml;charset=UTF-8," +
@@ -126,7 +127,7 @@ function OrderDetails() {
           <div>
             <span>Order ID</span>
             <h1>{order.id}</h1>
-            <p>{order.date || "Date unavailable"}</p>
+            <p>{formatOrderDate(order)}</p>
           </div>
 
           <OrderStatusBadge
