@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import SearchAI from "../components/SearchAI";
 import { useProducts } from "../context/ProductContext";
@@ -11,9 +11,21 @@ function Products() {
   } = useProducts();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] =
+    useState("");
+
+  useEffect(() => {
+    const timerId = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [searchQuery]);
 
   const filteredProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = debouncedSearchQuery.trim().toLowerCase();
 
     if (!query) {
       return products;
@@ -34,7 +46,7 @@ function Products() {
 
       return searchableText.includes(query);
     });
-  }, [products, searchQuery]);
+  }, [products, debouncedSearchQuery]);
 
   return (
     <main

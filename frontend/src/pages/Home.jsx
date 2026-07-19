@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HeroSection from "../components/home/HeroSection";
 import CategorySection from "../components/home/CategorySection";
 import SectionHeader from "../components/ui/SectionHeader";
@@ -10,9 +10,21 @@ import "./Home.css";
 function Home() {
   const { products } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] =
+    useState("");
+
+  useEffect(() => {
+    const timerId = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [searchQuery]);
 
   const filteredProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = debouncedSearchQuery.trim().toLowerCase();
 
     if (!query) {
       return products;
@@ -33,7 +45,7 @@ function Home() {
 
       return searchableText.includes(query);
     });
-  }, [products, searchQuery]);
+  }, [products, debouncedSearchQuery]);
 
   return (
     <main className="home-page">
