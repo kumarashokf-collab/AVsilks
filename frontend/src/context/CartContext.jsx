@@ -69,6 +69,28 @@ export function CartProvider({ children }) {
       Math.min(Number(quantity) || 1, 10)
     );
 
+    const normalizedProduct = normalizeProduct(product);
+
+    const hasKnownStock =
+      Number.isFinite(normalizedProduct.stock);
+
+    if (
+      hasKnownStock &&
+      normalizedProduct.stock <= 0
+    ) {
+      return;
+    }
+
+    const initialMaxAllowed =
+      hasKnownStock
+        ? Math.min(normalizedProduct.stock, 10)
+        : 10;
+
+    const safeInitialQuantity = Math.min(
+      requestedQuantity,
+      initialMaxAllowed
+    );
+
     setCart((currentCart) => {
       const existingItem = currentCart.find(
         (item) => item.id === product.id
@@ -95,13 +117,11 @@ export function CartProvider({ children }) {
         });
       }
 
-      const normalizedProduct = normalizeProduct(product);
-
       return [
         ...currentCart,
         {
           ...normalizedProduct,
-          quantity: requestedQuantity
+          quantity: safeInitialQuantity
         }
       ];
     });
