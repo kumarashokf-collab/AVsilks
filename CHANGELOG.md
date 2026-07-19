@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented here.
 
+## v0.7.3 - Cart Stock Safety
+Date: 2026-07-19
+
+### Added
+- Prevented out-of-stock products from being added to the cart.
+- Limited first-time cart quantity to available stock.
+- Preserved existing quantity merge behavior.
+
+### Verified
+- Audit ✅
+- Build ✅
+- Deploy ✅
+- Live Test ✅
+- Secret Scan ✅
+- Git Feature Branch ✅
+
+---
+
 ## v0.7.2 - Search Debounce
 Date: 2026-07-19
 
