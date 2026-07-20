@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { useCart } from "../context/CartContext";
 import { useOrders } from "../context/OrderContext";
+import { useProducts } from "../context/ProductContext";
 
 const ADDRESS_KEY = "avsilks_delivery_address";
 
@@ -44,6 +45,7 @@ function Checkout() {
   } = useCart();
 
   const { placeOrder } = useOrders();
+  const { products = [] } = useProducts();
 
   const items =
     location.state?.items ||
@@ -121,6 +123,87 @@ function Checkout() {
     setIsSubmitting(true);
 
     try {
+      const validatedItems = [];
+
+      for (const item of items) {
+        const liveProduct = products.find(
+          (product) => product.id === item.id
+        );
+
+        if (!liveProduct) {
+          throw new Error(
+            `${item.name || "Product"} ఇప్పుడు అందుబాటులో లేదు.`
+          );
+        }
+
+        if (liveProduct.active === false) {
+          throw new Error(
+            `${liveProduct.name || item.name} ప్రస్తుతం inactiveగా ఉంది.`
+          );
+        }
+
+        const liveStock = Number(liveProduct.stock || 0);
+        const requestedQuantity = Math.max(
+          1,
+          Number(item.quantity || 1)
+        );
+
+        if (!Number.isFinite(liveStock) || liveStock <= 0) {
+          throw new Error(
+            `${liveProduct.name || item.name} ప్రస్తుతం out of stock.`
+          );
+        }
+
+        if (requestedQuantity > liveStock) {
+          throw new Error(
+            `${liveProduct.name || item.name}కి ప్రస్తుతం ${liveStock} మాత్రమే stock ఉంది. Cartలో quantity తగ్గించండి.`
+          );
+        }
+
+        const livePrice = Number(
+          liveProduct.salePrice ||
+          liveProduct.price ||
+          0
+        );
+
+        if (!Number.isFinite(livePrice) || livePrice <= 0) {
+          throw new Error(
+            `${liveProduct.name || item.name} ధర verify కాలేదు.`
+          );
+        }
+
+        validatedItems.push({
+          ...item,
+          name: liveProduct.name || item.name,
+          price: livePrice,
+          stock: liveStock,
+          image:
+            liveProduct.image ||
+            liveProduct.imageUrl ||
+            item.image ||
+            "",
+          quantity: requestedQuantity
+        });
+      }
+
+      const validatedSubtotal = validatedItems.reduce(
+        (sum, item) =>
+          sum +
+          Number(item.price || 0) *
+            Number(item.quantity || 1),
+        0
+      );
+
+      const validatedShippingCharge =
+        validatedSubtotal >= 999 ||
+        validatedSubtotal === 0
+          ? 0
+          : 79;
+
+      const validatedGrandTotal =
+        validatedSubtotal +
+        validatedShippingCharge;
+
       localStorage.setItem(
         ADDRESS_KEY,
         JSON.stringify(form)
@@ -138,10 +221,10 @@ function Checkout() {
             pin: form.pin.trim()
           }
         },
-        items,
-        subtotal,
-        shippingCharge,
-        total: grandTotal,
+        items: validatedItems,
+        subtotal: validatedSubtotal,
+        shippingCharge: validatedShippingCharge,
+        total: validatedGrandTotal,
         payment: "Cash on Delivery"
       });
 
@@ -157,6 +240,7 @@ function Checkout() {
     } catch (error) {
       console.error("Order failed:", error);
       alert(
+        error?.message ||
         "ఆర్డర్ నమోదు కాలేదు. మళ్లీ ప్రయత్నించండి."
       );
     } finally {
