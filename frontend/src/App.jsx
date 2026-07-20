@@ -27,9 +27,14 @@ function RequireAuth({ user, children }) {
 }
 
 function RequireAdmin({ user, children }) {
-  const temporaryAdminPhone = "+917729911578";
-  if (!user) { return <Navigate to="/login" replace />; }
-  if (![temporaryAdminPhone, "+919999999991"].includes(user.phoneNumber)) { return <Navigate to="/" replace />; }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdminUser(user)) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
 
