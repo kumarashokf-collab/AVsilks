@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented here.
 
+## v0.7.4 - Checkout Validation
+Date: 2026-07-20
+
+### Added
+- Validated checkout items against the latest live product data.
+- Blocked missing, inactive, out-of-stock, and over-quantity products.
+- Recalculated subtotal, shipping, and total using the latest product price.
+
+### Verified
+- Audit ✅
+- Build ✅
+- Deploy ✅
+- Valid-order live test ✅
+- Secret Scan ✅
+- Git Feature Branch ✅
+
+---
+
 ## v0.7.3 - Cart Stock Safety
 Date: 2026-07-19
 
