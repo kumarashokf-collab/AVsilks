@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented here.
 
+## v0.7.5 - RBAC Foundation
+Date: 2026-07-21
+
+### Changed
+- Centralized frontend admin detection using `isAdminUser()`.
+- Removed duplicate admin phone lists.
+- Kept admin phone numbers only in `src/constants/admin.js`.
+- Updated Navbar and Login to use the centralized helper.
+
+### Verified
+- Build ✅
+- Preview Deploy ✅
+- Admin Login Redirect Live Test ✅
+- Admin Panel Visibility Live Test ✅
+- Secret Scan ✅
+- Git Feature Branch Commit ✅
+- Git Feature Branch Push ✅
+
+---
+
 ## v0.7.4 - Checkout Validation
 Date: 2026-07-20
 
