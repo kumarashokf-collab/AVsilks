@@ -33,7 +33,8 @@ function Navbar({ user }) {
     0
   );
 
-  const isTemporaryAdmin = isAdminUser(user);
+  const isTemporaryAdmin =
+    ["+917729911578", "+919999999991"].includes(user?.phoneNumber);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
