@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import logo from "../assets/logo.png";
 import { BRAND } from "../config/branding";
-import { isAdminUser } from "../constants/admin";
+import { getUserRole } from "../constants/admin";
+import { ROLES } from "../constants/roles";
 
 function Login() {
   const navigate = useNavigate();
@@ -143,7 +144,7 @@ function Login() {
 
       clearRecaptcha();
 
-      if (isAdminUser(result.user)) {
+      if (getUserRole(result.user) === ROLES.ADMIN) {
         navigate("/admin", {
           replace: true
         });
