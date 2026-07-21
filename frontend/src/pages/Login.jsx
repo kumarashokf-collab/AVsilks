@@ -8,11 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import logo from "../assets/logo.png";
 import { BRAND } from "../config/branding";
-
-const ADMIN_NUMBERS = [
-  "+917729911578",
-  "+919999999991"
-];
+import { isAdminUser } from "../constants/admin";
 
 function Login() {
   const navigate = useNavigate();
@@ -147,11 +143,7 @@ function Login() {
 
       clearRecaptcha();
 
-      if (
-        ADMIN_NUMBERS.includes(
-          result.user.phoneNumber
-        )
-      ) {
+      if (isAdminUser(result.user)) {
         navigate("/admin", {
           replace: true
         });
