@@ -18,7 +18,8 @@ const OrderDetails = lazy(() => import("./pages/orders/OrderDetails"));
 import { CartProvider } from "./context/CartContext";
 import { ProductProvider } from "./context/ProductContext";
 import { OrderProvider } from "./context/OrderContext";
-import { isAdminUser } from "./constants/admin";
+import { getUserRole } from "./constants/admin";
+import { ROLES } from "./constants/roles";
 import { BRAND } from "./config/branding";
 
 function RequireAuth({ user, children }) {
@@ -31,7 +32,7 @@ function RequireAdmin({ user, children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!isAdminUser(user)) {
+  if (getUserRole(user) !== ROLES.ADMIN) {
     return <Navigate to="/" replace />;
   }
 
