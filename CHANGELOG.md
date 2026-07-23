@@ -1,4 +1,13 @@
-# AVsilks Changelog
+ ## Unreleased
+
+### Security
+- Completed Phase 0 Security Recovery Gate.
+- Rotated Razorpay Test API Keys.
+- Rotated Firebase Service Account credentials.
+- Removed old Firebase service account keys.
+- Removed old Razorpay API key exports.
+- Verified repository with Gitleaks (no leaks found).
+- Hardened verifyAuth middleware with revoked-token validation, role extraction, and minimal req.user.    # AVsilks Changelog
 
 All notable changes to this project will be documented here.
 
