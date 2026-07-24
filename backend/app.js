@@ -1,11 +1,14 @@
-require("dotenv").config();
-const express = require("express");
+require("dotenv").config();const express = require("express");
 const cors = require("cors");
 const productRoutes = require("./src/routes/product.routes");
-
+const { validateRbacConfiguration } = require("./src/constants/validateRbac");
 const app = express();
 const PORT = process.env.PORT || 8080;
+const rbacStatus = validateRbacConfiguration();
 
+console.log("RBAC:", rbacStatus);
+
+console.log("RBAC configuration validated successfully.");
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
