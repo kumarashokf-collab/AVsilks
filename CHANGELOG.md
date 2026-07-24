@@ -1,4 +1,8 @@
- ## Unreleased
+# AVsilks Changelog
+
+All notable changes to this project will be documented here.
+
+## Unreleased
 
 ### Security
 - Completed Phase 0 Security Recovery Gate.
@@ -7,9 +11,30 @@
 - Removed old Firebase service account keys.
 - Removed old Razorpay API key exports.
 - Verified repository with Gitleaks (no leaks found).
-- Hardened verifyAuth middleware with revoked-token validation, role extraction, and minimal req.user.    # AVsilks Changelog
+- Hardened verifyAuth middleware with revoked-token validation, role extraction, and minimal req.user.
 
-All notable changes to this project will be documented here.
+### Backend RBAC Foundation
+#### Added
+- Added centralized backend role and permission catalogues.
+- Added role-to-permission mappings for 13 application roles.
+- Added reusable `verifyRole` and `requirePermission` middleware.
+- Added startup-time RBAC configuration validation.
+- Protected `POST /api/products` with authentication and `products.create` permission.
+- Added automated RBAC tests using the built-in Node.js test runner.
+- Added permanent `npm test` command for backend tests.
+- Added structured authorization-denial audit logging without tokens or personal data.
+
+#### Verified
+- RBAC configuration validation ✅
+- JavaScript syntax sweep ✅
+- Git diff and conflict-marker integrity check ✅
+- Missing-token HTTP response: 401 ✅
+- Invalid-token HTTP response: 401 ✅
+- Public product GET regression response: 200 ✅
+- Role-permission authorization matrix ✅
+- Automated RBAC tests: 14/14 PASS ✅
+- Focused RBAC source secret scan ✅
+- Authorization audit logging privacy check ✅
 
 ## v0.7.5 - RBAC Foundation
 Date: 2026-07-21
