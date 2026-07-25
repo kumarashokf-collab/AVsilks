@@ -19,7 +19,8 @@ import { auth } from "../firebase";
 import { useCart } from "../context/CartContext";
 import { STORE } from "../constants/store";
 import { BRAND } from "../config/branding";
-import { isAdminUser } from "../constants/admin";
+import { getUserRole } from "../constants/admin";
+import { ROLES } from "../constants/roles";
 import logo from "../assets/logo.png";
 import "./Navbar.css";
 
@@ -33,7 +34,7 @@ function Navbar({ user }) {
     0
   );
 
-  const isTemporaryAdmin = isAdminUser(user);
+  const isAdmin = getUserRole(user) === ROLES.ADMIN;
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -259,7 +260,7 @@ function Navbar({ user }) {
             <span>Privacy Policy</span>
           </Link>
 
-          {isTemporaryAdmin ? (
+          {isAdmin ? (
             <Link
               to="/admin"
               onClick={closeDrawer}
