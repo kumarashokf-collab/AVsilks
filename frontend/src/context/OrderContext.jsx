@@ -19,7 +19,8 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase";
-import { isAdminUser } from "../constants/admin";
+import { getUserRole } from "../constants/admin";
+import { ROLES } from "../constants/roles";
 
 const OrderContext = createContext(null);
 
@@ -74,7 +75,7 @@ export function OrderProvider({
     useState("");
 
   const admin = useMemo(
-    () => isAdminUser(user),
+    () => getUserRole(user) === ROLES.ADMIN,
     [user]
   );
 
