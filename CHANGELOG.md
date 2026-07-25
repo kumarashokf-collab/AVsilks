@@ -23,6 +23,7 @@ All notable changes to this project will be documented here.
 - Added automated RBAC tests using the built-in Node.js test runner.
 - Added permanent `npm test` command for backend tests.
 - Added structured authorization-denial audit logging without tokens or personal data.
+- Hardened authenticated role resolution with role validation, Firestore precedence, and fail-closed customer fallback.
 
 #### Verified
 - RBAC configuration validation ✅
@@ -32,9 +33,11 @@ All notable changes to this project will be documented here.
 - Invalid-token HTTP response: 401 ✅
 - Public product GET regression response: 200 ✅
 - Role-permission authorization matrix ✅
-- Automated RBAC tests: 14/14 PASS ✅
+- Automated RBAC tests: 17/17 PASS ✅
 - Focused RBAC source secret scan ✅
 - Authorization audit logging privacy check ✅
+- verifyAuth bearer-token and trusted-role helper tests ✅
+- Firestore role precedence and fail-closed fallback tests ✅
 
 ## v0.7.5 - RBAC Foundation
 Date: 2026-07-21
