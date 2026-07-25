@@ -224,3 +224,188 @@ test('verifyRole allows an authorized admin', () => {
   assert.equal(response.statusCode, 200);
   assert.equal(nextCalled, true);
 });
+
+
+function createRoleDatabase({
+  exists = false,
+  role = null,
+  error = null,
+} = {}) {
+  return {
+    collection() {
+      return {
+        doc() {
+          return {
+            async get() {
+              if (error) {
+                throw error;
+              }
+
+              return {
+                exists,
+                data() {
+                  return { role };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+}
+
+function loadVerifyAuthWithDatabase(database) {
+  const firebasePath = require.resolve(
+    '../src/config/firebase'
+  );
+  const verifyAuthPath = require.resolve(
+    '../src/middleware/verifyAuth'
+  );
+
+  delete require.cache[verifyAuthPath];
+
+  require.cache[firebasePath] = {
+    id: firebasePath,
+    filename: firebasePath,
+    loaded: true,
+    exports: {
+      admin: {},
+      db: database,
+    },
+  };
+
+  return require(verifyAuthPath);
+}
+
+test('verifyAuth bearer parsing and trusted-role normalization', () => {
+  const verifyAuth = loadVerifyAuthWithDatabase(
+    createRoleDatabase()
+  );
+
+  assert.equal(
+    verifyAuth.getBearerToken({
+      headers: {
+        authorization: 'Bearer token-123',
+      },
+    }),
+    'token-123'
+  );
+
+  assert.equal(
+    verifyAuth.getBearerToken({
+      headers: {
+        authorization: 'bearer token-456',
+      },
+    }),
+    'token-456'
+  );
+
+  assert.equal(
+    verifyAuth.getBearerToken({ headers: {} }),
+    ''
+  );
+
+  assert.equal(
+    verifyAuth.normalizeTrustedRole(' ADMIN '),
+    ROLES.ADMIN
+  );
+
+  assert.equal(
+    verifyAuth.normalizeTrustedRole('unknown-role'),
+    null
+  );
+});
+
+test('authenticated role resolution uses Firestore precedence', async () => {
+  const verifyAuth = loadVerifyAuthWithDatabase(
+    createRoleDatabase({
+      exists: true,
+      role: ROLES.ADMIN,
+    })
+  );
+
+  const role = await verifyAuth.resolveAuthenticatedRole({
+    uid: 'firestore-admin-test',
+    role: ROLES.OWNER,
+  });
+
+  assert.equal(role, ROLES.ADMIN);
+});
+
+test('authenticated role resolution fails closed', async () => {
+  const originalWarn = console.warn;
+  console.warn = () => {};
+
+  try {
+    let verifyAuth = loadVerifyAuthWithDatabase(
+      createRoleDatabase({
+        exists: true,
+        role: 'invalid-role',
+      })
+    );
+
+    assert.equal(
+      await verifyAuth.resolveAuthenticatedRole({
+        uid: 'invalid-firestore-role-test',
+        role: ROLES.OWNER,
+      }),
+      ROLES.CUSTOMER
+    );
+
+    verifyAuth = loadVerifyAuthWithDatabase(
+      createRoleDatabase({
+        exists: false,
+      })
+    );
+
+    assert.equal(
+      await verifyAuth.resolveAuthenticatedRole({
+        uid: 'custom-claim-fallback-test',
+        role: ROLES.VENDOR,
+      }),
+      ROLES.VENDOR
+    );
+
+    verifyAuth = loadVerifyAuthWithDatabase(
+      createRoleDatabase({
+        error: Object.assign(
+          new Error('simulated lookup failure'),
+          { code: 'test/firestore-failure' }
+        ),
+      })
+    );
+
+    assert.equal(
+      await verifyAuth.resolveAuthenticatedRole({
+        uid: 'firestore-failure-test',
+        role: ROLES.OWNER,
+      }),
+      ROLES.CUSTOMER
+    );
+
+    verifyAuth = loadVerifyAuthWithDatabase(
+      createRoleDatabase({
+        exists: false,
+      })
+    );
+
+    assert.equal(
+      await verifyAuth.resolveAuthenticatedRole({
+        uid: 'invalid-claim-test',
+        role: 'invalid-role',
+      }),
+      ROLES.CUSTOMER
+    );
+  } finally {
+    console.warn = originalWarn;
+
+    delete require.cache[
+      require.resolve('../src/middleware/verifyAuth')
+    ];
+
+    delete require.cache[
+      require.resolve('../src/config/firebase')
+    ];
+  }
+});

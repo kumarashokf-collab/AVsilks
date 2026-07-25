@@ -1,85 +1,64 @@
+'use strict';
+
 /**
- * ==========================================================
- * AV SILKS 2 ENTERPRISE RBAC CONSTITUTION
- * Version : 3.0
- * Status  : LOCKED FOUNDATION
- * ==========================================================
- * Single Source of Truth for every role,
- * permission, hierarchy and future expansion.
- * ==========================================================
+ * AV Silks 2 Backend RBAC Roles
+ * Status: Active development
+ *
+ * Role hierarchy is descriptive metadata only.
+ * Authorization decisions must use explicit permissions.
  */
 
 const ROLES = Object.freeze({
-
-  OWNER: "owner",
-
-  SUPER_ADMIN: "super_admin",
-
-  ADMIN: "admin",
-
-  VENDOR: "vendor",
-
-  STAFF: "staff",
-
-  CUSTOMER: "customer",
-
-  DELIVERY_PARTNER: "delivery_partner",
-
-  SUPPORT: "support",
-
-  AUDITOR: "auditor",
-
-  ACCOUNTANT: "accountant",
-
-  MARKETING: "marketing",
-
-  INVENTORY_MANAGER: "inventory_manager",
-
-  DEMO: "demo"
-
+  OWNER: 'owner',
+  SUPER_ADMIN: 'super_admin',
+  ADMIN: 'admin',
+  VENDOR: 'vendor',
+  STAFF: 'staff',
+  CUSTOMER: 'customer',
+  DELIVERY_PARTNER: 'delivery_partner',
+  SUPPORT: 'support',
+  AUDITOR: 'auditor',
+  ACCOUNTANT: 'accountant',
+  MARKETING: 'marketing',
+  INVENTORY_MANAGER: 'inventory_manager',
+  DEMO: 'demo',
 });
 
 const DEFAULT_ROLE = ROLES.CUSTOMER;
+const VALID_ROLES = Object.freeze(Object.values(ROLES));
+const VALID_ROLE_SET = new Set(VALID_ROLES);
 
-/**
- * Higher number = higher authority
- */
 const ROLE_HIERARCHY = Object.freeze({
-
-  owner: 100,
-
-  super_admin: 90,
-
-  admin: 80,
-
-  auditor: 70,
-
-  accountant: 65,
-
-  inventory_manager: 60,
-
-  marketing: 55,
-
-  support: 50,
-
-  vendor: 40,
-
-  staff: 30,
-
-  delivery_partner: 20,
-
-  customer: 10,
-
-  demo: 1
-
+  [ROLES.OWNER]: 100,
+  [ROLES.SUPER_ADMIN]: 90,
+  [ROLES.ADMIN]: 80,
+  [ROLES.AUDITOR]: 70,
+  [ROLES.ACCOUNTANT]: 65,
+  [ROLES.INVENTORY_MANAGER]: 60,
+  [ROLES.MARKETING]: 55,
+  [ROLES.SUPPORT]: 50,
+  [ROLES.VENDOR]: 40,
+  [ROLES.STAFF]: 30,
+  [ROLES.DELIVERY_PARTNER]: 20,
+  [ROLES.CUSTOMER]: 10,
+  [ROLES.DEMO]: 1,
 });
 
+function normalizeRole(value) {
+  return typeof value === 'string'
+    ? value.trim().toLowerCase()
+    : '';
+}
+
+function isValidRole(value) {
+  return VALID_ROLE_SET.has(normalizeRole(value));
+}
+
 module.exports = {
-
   ROLES,
-
   DEFAULT_ROLE,
-
-  ROLE_HIERARCHY
-
+  VALID_ROLES,
+  ROLE_HIERARCHY,
+  normalizeRole,
+  isValidRole,
 };
