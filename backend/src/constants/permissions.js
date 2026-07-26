@@ -1,0 +1,168 @@
+/**
+ * AV SILKS 2 — ENTERPRISE PERMISSION CATALOG
+ *
+ * Format:
+ *   resource.action
+ *
+ * Rules:
+ * - Permissions are immutable identifiers.
+ * - Existing permission values must never be renamed casually.
+ * - New permissions may be added without changing middleware architecture.
+ * - Authorization must use permissions, not numeric role hierarchy alone.
+ */
+
+const ACTIONS = Object.freeze({
+  CREATE: "create",
+  READ: "read",
+  UPDATE: "update",
+  DELETE: "delete",
+  LIST: "list",
+  MANAGE: "manage",
+  APPROVE: "approve",
+  REJECT: "reject",
+  CANCEL: "cancel",
+  REFUND: "refund",
+  EXPORT: "export",
+  ASSIGN: "assign",
+  PUBLISH: "publish",
+  ARCHIVE: "archive",
+  RESTORE: "restore"
+});
+
+const RESOURCES = Object.freeze({
+  PRODUCTS: "products",
+  CATEGORIES: "categories",
+  INVENTORY: "inventory",
+  CARTS: "carts",
+  WISHLISTS: "wishlists",
+  ORDERS: "orders",
+  PAYMENTS: "payments",
+  REFUNDS: "refunds",
+  COUPONS: "coupons",
+  REVIEWS: "reviews",
+  USERS: "users",
+  ROLES: "roles",
+  VENDORS: "vendors",
+  DELIVERIES: "deliveries",
+  INVOICES: "invoices",
+  NOTIFICATIONS: "notifications",
+  REPORTS: "reports",
+  ANALYTICS: "analytics",
+  AUDIT_LOGS: "audit_logs",
+  SETTINGS: "settings",
+  SECURITY: "security",
+  BACKUPS: "backups",
+  AI: "ai",
+  API_CLIENTS: "api_clients"
+});
+
+function permission(resource, action) {
+  if (!Object.values(RESOURCES).includes(resource)) {
+    throw new Error(`Unknown permission resource: ${resource}`);
+  }
+
+  if (!Object.values(ACTIONS).includes(action)) {
+    throw new Error(`Unknown permission action: ${action}`);
+  }
+
+  return `${resource}.${action}`;
+}
+
+const PERMISSIONS = Object.freeze({
+  PRODUCTS_CREATE: permission(RESOURCES.PRODUCTS, ACTIONS.CREATE),
+  PRODUCTS_READ: permission(RESOURCES.PRODUCTS, ACTIONS.READ),
+  PRODUCTS_UPDATE: permission(RESOURCES.PRODUCTS, ACTIONS.UPDATE),
+  PRODUCTS_DELETE: permission(RESOURCES.PRODUCTS, ACTIONS.DELETE),
+  PRODUCTS_LIST: permission(RESOURCES.PRODUCTS, ACTIONS.LIST),
+  PRODUCTS_PUBLISH: permission(RESOURCES.PRODUCTS, ACTIONS.PUBLISH),
+
+  CATEGORIES_CREATE: permission(RESOURCES.CATEGORIES, ACTIONS.CREATE),
+  CATEGORIES_READ: permission(RESOURCES.CATEGORIES, ACTIONS.READ),
+  CATEGORIES_UPDATE: permission(RESOURCES.CATEGORIES, ACTIONS.UPDATE),
+  CATEGORIES_DELETE: permission(RESOURCES.CATEGORIES, ACTIONS.DELETE),
+  CATEGORIES_LIST: permission(RESOURCES.CATEGORIES, ACTIONS.LIST),
+
+  INVENTORY_READ: permission(RESOURCES.INVENTORY, ACTIONS.READ),
+  INVENTORY_UPDATE: permission(RESOURCES.INVENTORY, ACTIONS.UPDATE),
+  INVENTORY_MANAGE: permission(RESOURCES.INVENTORY, ACTIONS.MANAGE),
+
+  ORDERS_CREATE: permission(RESOURCES.ORDERS, ACTIONS.CREATE),
+  ORDERS_READ: permission(RESOURCES.ORDERS, ACTIONS.READ),
+  ORDERS_UPDATE: permission(RESOURCES.ORDERS, ACTIONS.UPDATE),
+  ORDERS_LIST: permission(RESOURCES.ORDERS, ACTIONS.LIST),
+  ORDERS_CANCEL: permission(RESOURCES.ORDERS, ACTIONS.CANCEL),
+  ORDERS_ASSIGN: permission(RESOURCES.ORDERS, ACTIONS.ASSIGN),
+
+  PAYMENTS_READ: permission(RESOURCES.PAYMENTS, ACTIONS.READ),
+  PAYMENTS_MANAGE: permission(RESOURCES.PAYMENTS, ACTIONS.MANAGE),
+
+  REFUNDS_CREATE: permission(RESOURCES.REFUNDS, ACTIONS.CREATE),
+  REFUNDS_READ: permission(RESOURCES.REFUNDS, ACTIONS.READ),
+  REFUNDS_APPROVE: permission(RESOURCES.REFUNDS, ACTIONS.APPROVE),
+  REFUNDS_REJECT: permission(RESOURCES.REFUNDS, ACTIONS.REJECT),
+
+  USERS_READ: permission(RESOURCES.USERS, ACTIONS.READ),
+  USERS_UPDATE: permission(RESOURCES.USERS, ACTIONS.UPDATE),
+  USERS_LIST: permission(RESOURCES.USERS, ACTIONS.LIST),
+  USERS_MANAGE: permission(RESOURCES.USERS, ACTIONS.MANAGE),
+
+  ROLES_READ: permission(RESOURCES.ROLES, ACTIONS.READ),
+  ROLES_ASSIGN: permission(RESOURCES.ROLES, ACTIONS.ASSIGN),
+  ROLES_MANAGE: permission(RESOURCES.ROLES, ACTIONS.MANAGE),
+
+  VENDORS_CREATE: permission(RESOURCES.VENDORS, ACTIONS.CREATE),
+  VENDORS_READ: permission(RESOURCES.VENDORS, ACTIONS.READ),
+  VENDORS_UPDATE: permission(RESOURCES.VENDORS, ACTIONS.UPDATE),
+  VENDORS_LIST: permission(RESOURCES.VENDORS, ACTIONS.LIST),
+  VENDORS_APPROVE: permission(RESOURCES.VENDORS, ACTIONS.APPROVE),
+  VENDORS_REJECT: permission(RESOURCES.VENDORS, ACTIONS.REJECT),
+  VENDORS_MANAGE: permission(RESOURCES.VENDORS, ACTIONS.MANAGE),
+
+  DELIVERIES_READ: permission(RESOURCES.DELIVERIES, ACTIONS.READ),
+  DELIVERIES_UPDATE: permission(RESOURCES.DELIVERIES, ACTIONS.UPDATE),
+  DELIVERIES_ASSIGN: permission(RESOURCES.DELIVERIES, ACTIONS.ASSIGN),
+
+  REPORTS_READ: permission(RESOURCES.REPORTS, ACTIONS.READ),
+  REPORTS_EXPORT: permission(RESOURCES.REPORTS, ACTIONS.EXPORT),
+
+  ANALYTICS_READ: permission(RESOURCES.ANALYTICS, ACTIONS.READ),
+
+  AUDIT_LOGS_READ: permission(RESOURCES.AUDIT_LOGS, ACTIONS.READ),
+  AUDIT_LOGS_EXPORT: permission(RESOURCES.AUDIT_LOGS, ACTIONS.EXPORT),
+
+  SETTINGS_READ: permission(RESOURCES.SETTINGS, ACTIONS.READ),
+  SETTINGS_UPDATE: permission(RESOURCES.SETTINGS, ACTIONS.UPDATE),
+  SETTINGS_MANAGE: permission(RESOURCES.SETTINGS, ACTIONS.MANAGE),
+
+  SECURITY_READ: permission(RESOURCES.SECURITY, ACTIONS.READ),
+  SECURITY_MANAGE: permission(RESOURCES.SECURITY, ACTIONS.MANAGE),
+
+  BACKUPS_CREATE: permission(RESOURCES.BACKUPS, ACTIONS.CREATE),
+  BACKUPS_READ: permission(RESOURCES.BACKUPS, ACTIONS.READ),
+  BACKUPS_RESTORE: permission(RESOURCES.BACKUPS, ACTIONS.RESTORE),
+
+  AI_READ: permission(RESOURCES.AI, ACTIONS.READ),
+  AI_MANAGE: permission(RESOURCES.AI, ACTIONS.MANAGE),
+
+  API_CLIENTS_CREATE: permission(RESOURCES.API_CLIENTS, ACTIONS.CREATE),
+  API_CLIENTS_READ: permission(RESOURCES.API_CLIENTS, ACTIONS.READ),
+  API_CLIENTS_UPDATE: permission(RESOURCES.API_CLIENTS, ACTIONS.UPDATE),
+  API_CLIENTS_DELETE: permission(RESOURCES.API_CLIENTS, ACTIONS.DELETE)
+});
+
+const VALID_PERMISSIONS = Object.freeze(
+  new Set(Object.values(PERMISSIONS))
+);
+
+function isValidPermission(value) {
+  return typeof value === "string" && VALID_PERMISSIONS.has(value);
+}
+
+module.exports = {
+  ACTIONS,
+  RESOURCES,
+  PERMISSIONS,
+  VALID_PERMISSIONS,
+  permission,
+  isValidPermission
+};
