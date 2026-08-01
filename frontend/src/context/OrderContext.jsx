@@ -7,14 +7,10 @@ import {
 } from "react";
 
 import {
-  addDoc,
   collection,
-  doc,
   onSnapshot,
   orderBy,
   query,
-  serverTimestamp,
-  updateDoc,
   where
 } from "firebase/firestore";
 
@@ -62,6 +58,20 @@ function normalizeItems(items) {
     sku: String(item?.sku || ""),
     category: String(item?.category || "")
   }));
+}
+
+function getApiBaseUrl() {
+  const configuredBaseUrl =
+    import.meta.env.PROD
+      ? "/api"
+      : (
+          import.meta.env.VITE_API_BASE_URL ||
+          "/api"
+        );
+
+  return String(configuredBaseUrl)
+    .trim()
+    .replace(/\/+$/, "");
 }
 
 export function OrderProvider({
@@ -140,13 +150,38 @@ export function OrderProvider({
       );
     }
 
+    if (typeof user.getIdToken !== "function") {
+      throw new Error(
+        "Authentication session verify కాలేదు. మళ్లీ login చేయండి."
+      );
+    }
+
+    const idempotencyKey = String(
+      orderData.idempotencyKey || ""
+    ).trim();
+
+    if (
+      idempotencyKey.length < 16 ||
+      idempotencyKey.length > 128
+    ) {
+      throw new Error(
+        "Secure checkout key invalidగా ఉంది. మళ్లీ ప్రయత్నించండి."
+      );
+    }
+
     const items = normalizeItems(
       orderData.items
-    );
+    ).map((item) => ({
+      productId: item.id,
+      quantity: item.quantity
+    }));
 
-    if (items.length === 0) {
+    if (
+      items.length === 0 ||
+      items.some((item) => !item.productId)
+    ) {
       throw new Error(
-        "Order must contain at least one item."
+        "Order must contain valid products."
       );
     }
 
@@ -176,75 +211,169 @@ export function OrderProvider({
       }
     };
 
-    const subtotal = Number(
-      orderData.subtotal ??
-      items.reduce(
-        (sum, item) =>
-          sum +
-          item.price * item.quantity,
-        0
-      )
+    const apiBaseUrl =
+      getApiBaseUrl();
+
+    const idToken =
+      await user.getIdToken();
+
+    const response = await fetch(
+      `${apiBaseUrl}/orders`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          idempotencyKey,
+          customer,
+          items,
+          paymentMethod: "cod"
+        })
+      }
     );
 
-    const shippingCharge = Number(
-      orderData.shippingCharge || 0
+    let result = null;
+
+    try {
+      result = await response.json();
+    } catch {
+      result = null;
+    }
+
+    if (
+      !response.ok ||
+      result?.success !== true ||
+      !result?.data?.id
+    ) {
+      const requestError = new Error(
+        result?.message ||
+        "ఆర్డర్ నమోదు కాలేదు. మళ్లీ ప్రయత్నించండి."
+      );
+
+      requestError.code =
+        result?.code ||
+        "ORDER_REQUEST_FAILED";
+
+      requestError.details =
+        Array.isArray(result?.details)
+          ? result.details
+          : [];
+
+      throw requestError;
+    }
+
+    return result.data;
+  }
+
+  async function cancelOrder(
+    id,
+    reason
+  ) {
+    if (!user) {
+      throw new Error(
+        "Order cancel చేయడానికి login అవసరం."
+      );
+    }
+
+    if (
+      typeof user.getIdToken !==
+      "function"
+    ) {
+      throw new Error(
+        "Authentication session verify కాలేదు. మళ్లీ login చేయండి."
+      );
+    }
+
+    const orderId =
+      String(id || "").trim();
+
+    const cancellationReason =
+      String(reason || "").trim();
+
+    if (
+      !orderId ||
+      orderId.includes("/") ||
+      orderId.length > 128
+    ) {
+      throw new Error(
+        "Valid order ID అవసరం."
+      );
+    }
+
+    if (
+      cancellationReason.length < 3 ||
+      cancellationReason.length > 300
+    ) {
+      throw new Error(
+        "Cancel reason 3 నుంచి 300 characters మధ్య ఉండాలి."
+      );
+    }
+
+    const idToken =
+      await user.getIdToken();
+
+    const response = await fetch(
+      `${getApiBaseUrl()}/orders/${encodeURIComponent(
+        orderId
+      )}/cancel`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization:
+            `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          reason:
+            cancellationReason
+        })
+      }
     );
 
-    const total = Number(
-      orderData.total ??
-      subtotal + shippingCharge
-    );
+    let result = null;
 
-    const productLabel = items
-      .map((item) => item.name)
-      .join(", ");
+    try {
+      result =
+        await response.json();
+    } catch {
+      result = null;
+    }
 
-    const orderPayload = {
-      userId: user.uid,
-      userPhone: user.phoneNumber || "",
-      customer,
-      customerName: customer.name,
-      customerPhone: customer.phone,
-      product: productLabel,
-      items,
-      subtotal,
-      shippingCharge,
-      total,
-      price: total,
-      payment:
-        orderData.payment ||
-        "Cash on Delivery",
-      paymentStatus:
-        orderData.paymentStatus ||
-        "Pending on Delivery",
-      status: "Processing",
-      cancelReason: "",
-      statusHistory: [
-        {
-          status: "Processing",
-          date: new Date().toISOString(),
-          note: "Order placed successfully"
-        }
-      ],
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
+    if (
+      !response.ok ||
+      result?.success !== true ||
+      !result?.data?.id
+    ) {
+      const requestError =
+        new Error(
+          result?.message ||
+          "Order cancel కాలేదు. మళ్లీ ప్రయత్నించండి."
+        );
 
-    const orderRef = await addDoc(
-      collection(db, "orders"),
-      orderPayload
-    );
+      requestError.code =
+        result?.code ||
+        "ORDER_CANCELLATION_FAILED";
 
-    return {
-      id: orderRef.id,
-      ...orderPayload
-    };
+      requestError.details =
+        Array.isArray(
+          result?.details
+        )
+          ? result.details
+          : [];
+
+      throw requestError;
+    }
+
+    return result.data;
   }
 
   async function updateOrderStatus(
     id,
     newStatus,
-    reason = ""
+    note = ""
   ) {
     if (!admin) {
       throw new Error(
@@ -252,31 +381,112 @@ export function OrderProvider({
       );
     }
 
-    const currentOrder = orders.find(
-      (order) => order.id === id
-    );
+    if (
+      !user ||
+      typeof user.getIdToken !==
+        "function"
+    ) {
+      throw new Error(
+        "Authentication session verify కాలేదు. మళ్లీ login చేయండి."
+      );
+    }
 
-    const currentHistory =
-      Array.isArray(currentOrder?.statusHistory)
-        ? currentOrder.statusHistory
-        : [];
+    const orderId =
+      String(id || "").trim();
 
-    await updateDoc(
-      doc(db, "orders", id),
+    const status =
+      String(newStatus || "").trim();
+
+    const normalizedNote =
+      String(note || "").trim();
+
+    const allowedStatuses =
+      new Set([
+        "Confirmed",
+        "Packed",
+        "Shipped",
+        "Delivered"
+      ]);
+
+    if (
+      !orderId ||
+      orderId.includes("/") ||
+      orderId.length > 128
+    ) {
+      throw new Error(
+        "Valid order ID అవసరం."
+      );
+    }
+
+    if (!allowedStatuses.has(status)) {
+      throw new Error(
+        "Valid fulfilment status అవసరం."
+      );
+    }
+
+    if (normalizedNote.length > 300) {
+      throw new Error(
+        "Status note 300 characters కంటే ఎక్కువ ఉండకూడదు."
+      );
+    }
+
+    const idToken =
+      await user.getIdToken();
+
+    const response = await fetch(
+      `${getApiBaseUrl()}/orders/${encodeURIComponent(
+        orderId
+      )}/status`,
       {
-        status: newStatus,
-        cancelReason: reason,
-        updatedAt: serverTimestamp(),
-        statusHistory: [
-          ...currentHistory,
-          {
-            status: newStatus,
-            date: new Date().toISOString(),
-            note: reason
-          }
-        ]
+        method: "PATCH",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization:
+            `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          status,
+          note: normalizedNote
+        })
       }
     );
+
+    let result = null;
+
+    try {
+      result =
+        await response.json();
+    } catch {
+      result = null;
+    }
+
+    if (
+      !response.ok ||
+      result?.success !== true ||
+      !result?.data?.id
+    ) {
+      const requestError =
+        new Error(
+          result?.message ||
+          "Order status update కాలేదు. మళ్లీ ప్రయత్నించండి."
+        );
+
+      requestError.code =
+        result?.code ||
+        "ORDER_TRANSITION_FAILED";
+
+      requestError.details =
+        Array.isArray(
+          result?.details
+        )
+          ? result.details
+          : [];
+
+      throw requestError;
+    }
+
+    return result.data;
   }
 
   function clearOrders() {
@@ -288,6 +498,7 @@ export function OrderProvider({
     ordersLoading,
     ordersError,
     placeOrder,
+    cancelOrder,
     updateOrderStatus,
     clearOrders
   };
