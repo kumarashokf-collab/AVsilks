@@ -84,6 +84,7 @@ async function verifyAuth(req, res, next) {
     if (!idToken) {
       return res.status(401).json({
         success: false,
+        code: 'AUTHENTICATION_REQUIRED',
         message: 'Authentication token is required.',
       });
     }
@@ -99,6 +100,7 @@ async function verifyAuth(req, res, next) {
     if (userRecord.disabled) {
       return res.status(403).json({
         success: false,
+        code: 'ACCOUNT_DISABLED',
         message: 'User account is disabled.',
       });
     }
@@ -122,6 +124,7 @@ async function verifyAuth(req, res, next) {
 
     return res.status(401).json({
       success: false,
+      code: 'AUTHENTICATION_INVALID',
       message:
         'Invalid, expired or revoked authentication token.',
     });

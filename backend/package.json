@@ -2,7 +2,7 @@
   "name": "av-silks-backend",
   "version": "1.0.0",
   "description": "AV Silks Backend",
-  "main": "app.js",
+  "main": "functions.js",
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
@@ -13,9 +13,13 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.6.1",
     "express": "^4.22.2",
-    "firebase-admin": "^12.7.0",
+    "firebase-admin": "12.7.0",
+    "firebase-functions": "7.2.5",
     "joi": "^17.13.0",
     "pdfkit": "^0.15.0",
     "razorpay": "^2.9.4"
+  },
+  "engines": {
+    "node": "22"
   }
 }

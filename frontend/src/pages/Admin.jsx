@@ -23,6 +23,29 @@ const EMPTY_PRODUCT = {
   active: true
 };
 
+const ORDER_FULFILMENT_ACTIONS =
+  Object.freeze({
+    Processing: Object.freeze({
+      nextStatus: "Confirmed",
+      label: "Confirm Order"
+    }),
+
+    Confirmed: Object.freeze({
+      nextStatus: "Packed",
+      label: "Mark Packed"
+    }),
+
+    Packed: Object.freeze({
+      nextStatus: "Shipped",
+      label: "Mark Shipped"
+    }),
+
+    Shipped: Object.freeze({
+      nextStatus: "Delivered",
+      label: "Mark Delivered"
+    })
+  });
+
 function Admin() {
   const [activeTab, setActiveTab] = useState("orders");
   const [newProduct, setNewProduct] = useState(EMPTY_PRODUCT);
@@ -30,6 +53,16 @@ function Admin() {
   const [selectedImageFiles, setSelectedImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  const [
+    statusUpdatingOrderId,
+    setStatusUpdatingOrderId
+  ] = useState("");
+
+  const [
+    statusUpdateError,
+    setStatusUpdateError
+  ] = useState(null);
 
   const {
     products = [],
@@ -351,6 +384,62 @@ function Admin() {
     color: "var(--color-text)"
   };
 
+  async function handleOrderStatusUpdate(
+    order
+  ) {
+    const orderId =
+      String(order?.id || "").trim();
+
+    const currentStatus =
+      String(order?.status || "").trim();
+
+    const action =
+      ORDER_FULFILMENT_ACTIONS[
+        currentStatus
+      ];
+
+    if (
+      !orderId ||
+      orderId.includes("/") ||
+      orderId.length > 128
+    ) {
+      setStatusUpdateError({
+        orderId,
+        message:
+          "Valid order ID అందుబాటులో లేదు."
+      });
+
+      return;
+    }
+
+    if (
+      !action ||
+      statusUpdatingOrderId
+    ) {
+      return;
+    }
+
+    setStatusUpdatingOrderId(orderId);
+    setStatusUpdateError(null);
+
+    try {
+      await updateOrderStatus(
+        orderId,
+        action.nextStatus,
+        `Admin changed order status from ${currentStatus} to ${action.nextStatus}.`
+      );
+    } catch (error) {
+      setStatusUpdateError({
+        orderId,
+        message:
+          error?.message ||
+          "Order status update కాలేదు. మళ్లీ ప్రయత్నించండి."
+      });
+    } finally {
+      setStatusUpdatingOrderId("");
+    }
+  }
+
   return (
     <main
       className="container section"
@@ -503,17 +592,54 @@ function Admin() {
                     {order.status}
                   </span>
 
-                  {order.status === "Processing" && (
-                    <button
-                      type="button"
-                      className="btn btn--primary"
-                      onClick={() =>
-                        updateOrderStatus(order.id, "Shipped")
-                      }
+                  {ORDER_FULFILMENT_ACTIONS[
+                    order.status
+                  ] ? (
+                    <div
+                      style={{
+                        display: "grid",
+                        gap: "8px"
+                      }}
                     >
-                      Approve Order
-                    </button>
-                  )}
+                      <button
+                        type="button"
+                        className="btn btn--primary"
+                        onClick={() =>
+                          handleOrderStatusUpdate(
+                            order
+                          )
+                        }
+                        disabled={Boolean(
+                          statusUpdatingOrderId
+                        )}
+                      >
+                        {statusUpdatingOrderId ===
+                        String(order.id || "")
+                          ? "Updating..."
+                          : ORDER_FULFILMENT_ACTIONS[
+                              order.status
+                            ].label}
+                      </button>
+
+                      {statusUpdateError?.orderId ===
+                      String(order.id || "") ? (
+                        <span
+                          role="alert"
+                          style={{
+                            color:
+                              "var(--color-danger)",
+                            fontSize:
+                              "var(--font-size-sm)",
+                            fontWeight: 700
+                          }}
+                        >
+                          {
+                            statusUpdateError.message
+                          }
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ))

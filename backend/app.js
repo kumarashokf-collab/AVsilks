@@ -1,6 +1,11 @@
-require("dotenv").config();const express = require("express");
+require("dotenv").config();
+
+const express = require("express");
 const cors = require("cors");
 const productRoutes = require("./src/routes/product.routes");
+const {
+  createOrderRouter,
+} = require("./src/routes/order.routes");
 const { validateRbacConfiguration } = require("./src/constants/validateRbac");
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -21,7 +26,12 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/products", productRoutes);
+app.use("/api/orders", createOrderRouter());
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`AVsilks API running on http://localhost:${PORT}`);
-});
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`AVsilks API running on http://localhost:${PORT}`);
+  });
+}
