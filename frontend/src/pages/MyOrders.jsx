@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 import OrderCard from "../components/orders/OrderCard";
 
 function Profile() {
-  const { orders, updateOrderStatus } = useOrders();
+  const { orders, cancelOrder } = useOrders();
   const { addToCart } = useCart();
 
   const [cancelOrderId, setCancelOrderId] =
@@ -15,29 +15,72 @@ function Profile() {
   const [cancelReason, setCancelReason] =
     useState("");
 
+  const [
+    cancelSubmitting,
+    setCancelSubmitting
+  ] = useState(false);
+
+  const [
+    cancelError,
+    setCancelError
+  ] = useState("");
+
   function handleOpenCancel(orderId) {
     setCancelOrderId(orderId);
     setCancelReason("");
+    setCancelError("");
   }
 
   function handleCloseCancel() {
-    setCancelOrderId(null);
-    setCancelReason("");
-  }
-
-  function handleConfirmCancel() {
-    if (!cancelReason.trim()) {
-      alert("దయచేసి cancel reason నమోదు చేయండి.");
+    if (cancelSubmitting) {
       return;
     }
 
-    updateOrderStatus(
-      cancelOrderId,
-      "Cancelled",
-      cancelReason.trim()
-    );
+    setCancelOrderId(null);
+    setCancelReason("");
+    setCancelError("");
+  }
 
-    handleCloseCancel();
+  async function handleConfirmCancel() {
+    const reason =
+      cancelReason.trim();
+
+    if (
+      reason.length < 3 ||
+      reason.length > 300
+    ) {
+      setCancelError(
+        "Cancel reason 3 నుంచి 300 characters మధ్య ఉండాలి."
+      );
+      return;
+    }
+
+    if (
+      cancelSubmitting ||
+      !cancelOrderId
+    ) {
+      return;
+    }
+
+    setCancelSubmitting(true);
+    setCancelError("");
+
+    try {
+      await cancelOrder(
+        cancelOrderId,
+        reason
+      );
+
+      setCancelOrderId(null);
+      setCancelReason("");
+    } catch (error) {
+      setCancelError(
+        error?.message ||
+        "Order cancel కాలేదు. మళ్లీ ప్రయత్నించండి."
+      );
+    } finally {
+      setCancelSubmitting(false);
+    }
   }
 
   function handleReorder(order) {
@@ -228,6 +271,8 @@ function Profile() {
               onChange={(event) =>
                 setCancelReason(event.target.value)
               }
+              disabled={cancelSubmitting}
+              maxLength={300}
               placeholder="ఉదాహరణ: తప్పు product ఎంపిక చేశాను"
               rows={4}
               style={{
@@ -239,6 +284,20 @@ function Profile() {
                 resize: "vertical"
               }}
             />
+
+            {cancelError ? (
+              <p
+                role="alert"
+                style={{
+                  marginTop: "10px",
+                  color:
+                    "var(--color-danger)",
+                  fontWeight: 700
+                }}
+              >
+                {cancelError}
+              </p>
+            ) : null}
 
             <div
               style={{
@@ -252,6 +311,7 @@ function Profile() {
                 type="button"
                 className="btn btn--ghost"
                 onClick={handleCloseCancel}
+                disabled={cancelSubmitting}
               >
                 Keep Order
               </button>
@@ -260,12 +320,15 @@ function Profile() {
                 type="button"
                 className="btn"
                 onClick={handleConfirmCancel}
+                disabled={cancelSubmitting}
                 style={{
                   background: "var(--color-danger)",
                   color: "white"
                 }}
               >
-                Confirm Cancel
+                {cancelSubmitting
+                  ? "Cancelling..."
+                  : "Confirm Cancel"}
               </button>
             </div>
           </section>
