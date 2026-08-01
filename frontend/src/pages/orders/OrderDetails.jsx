@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
@@ -34,8 +35,13 @@ function OrderDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { orders, updateOrderStatus } = useOrders();
+  const { orders, cancelOrder } = useOrders();
   const { addToCart } = useCart();
+
+  const [
+    cancelSubmitting,
+    setCancelSubmitting
+  ] = useState(false);
 
   const order = orders.find(
     (item) => String(item.id) === String(id)
@@ -95,20 +101,47 @@ function OrderDetails() {
     navigate("/cart");
   }
 
-  function handleCancel() {
+  async function handleCancel() {
+    if (cancelSubmitting) {
+      return;
+    }
+
     const reason = window.prompt(
       "Order cancel చేయడానికి కారణం నమోదు చేయండి:"
     );
 
-    if (!reason?.trim()) {
+    const normalizedReason =
+      String(reason || "").trim();
+
+    if (!normalizedReason) {
       return;
     }
 
-    updateOrderStatus(
-      order.id,
-      "Cancelled",
-      reason.trim()
-    );
+    if (
+      normalizedReason.length < 3 ||
+      normalizedReason.length > 300
+    ) {
+      window.alert(
+        "Cancel reason 3 నుంచి 300 characters మధ్య ఉండాలి."
+      );
+      return;
+    }
+
+    setCancelSubmitting(true);
+
+    try {
+      await cancelOrder(
+        order.id,
+        normalizedReason
+      );
+    } catch (error) {
+      window.alert(
+        error?.message ||
+        "Order cancel కాలేదు. మళ్లీ ప్రయత్నించండి."
+      );
+    } finally {
+      setCancelSubmitting(false);
+    }
   }
 
   return (
@@ -311,8 +344,11 @@ function OrderDetails() {
                 type="button"
                 className="btn order-details-cancel"
                 onClick={handleCancel}
+                disabled={cancelSubmitting}
               >
-                Cancel Order
+                {cancelSubmitting
+                  ? "Cancelling..."
+                  : "Cancel Order"}
               </button>
             ) : null}
           </aside>

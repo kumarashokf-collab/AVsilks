@@ -69,6 +69,56 @@ test('customer cannot create products', () => {
   );
 });
 
+test('customer can request order cancellation', () => {
+  assert.equal(
+    roleHasPermission(
+      ROLES.CUSTOMER,
+      PERMISSIONS.ORDERS_CANCEL
+    ),
+    true
+  );
+});
+
+test('customer cannot perform arbitrary order status updates', () => {
+  assert.equal(
+    roleHasPermission(
+      ROLES.CUSTOMER,
+      PERMISSIONS.ORDERS_UPDATE
+    ),
+    false
+  );
+});
+
+test('permission middleware allows customer cancellation authority', () => {
+  const request = {
+    user: {
+      uid: 'test-customer-cancel',
+      role: ROLES.CUSTOMER,
+    },
+  };
+
+  const response = createResponse();
+  let nextCalled = false;
+
+  requirePermission(
+    PERMISSIONS.ORDERS_CANCEL
+  )(
+    request,
+    response,
+    () => {
+      nextCalled = true;
+    }
+  );
+
+  assert.equal(nextCalled, true);
+  assert.equal(response.statusCode, 200);
+
+  assert.deepEqual(
+    request.authorization.requiredPermissions,
+    [PERMISSIONS.ORDERS_CANCEL]
+  );
+});
+
 test('permission matcher supports global and scoped wildcards', () => {
   assert.equal(matchesPermission('*', PERMISSIONS.PRODUCTS_CREATE), true);
   assert.equal(

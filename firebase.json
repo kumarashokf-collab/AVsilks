@@ -1,0 +1,51 @@
+{
+  "firestore": {
+    "rules": "frontend/firestore.rules"
+  },
+  "functions": [
+    {
+      "source": "backend",
+      "codebase": "api",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local",
+        ".env",
+        ".env.*",
+        "test",
+        "coverage",
+        "*.log",
+        "*serviceAccount*.json",
+        "*firebase-admin-key*.json",
+        "*.pem",
+        "*.key",
+        ".backups",
+        "backups"
+      ]
+    }
+  ],
+  "hosting": {
+    "public": "frontend/dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": {
+          "functionId": "api",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

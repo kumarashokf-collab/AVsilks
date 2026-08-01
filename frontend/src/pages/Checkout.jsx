@@ -6,6 +6,115 @@ import { useOrders } from "../context/OrderContext";
 import { useProducts } from "../context/ProductContext";
 
 const ADDRESS_KEY = "avsilks_delivery_address";
+const CHECKOUT_IDEMPOTENCY_STORAGE_KEY =
+  "avsilks_checkout_idempotency";
+
+function createCheckoutIdempotencyKey() {
+  if (
+    globalThis.crypto &&
+    typeof globalThis.crypto.randomUUID ===
+      "function"
+  ) {
+    return globalThis.crypto.randomUUID();
+  }
+
+  if (
+    globalThis.crypto &&
+    typeof globalThis.crypto.getRandomValues ===
+      "function"
+  ) {
+    const bytes = new Uint8Array(16);
+    globalThis.crypto.getRandomValues(bytes);
+
+    return Array.from(
+      bytes,
+      (byte) =>
+        byte.toString(16).padStart(2, "0")
+    ).join("");
+  }
+
+  return [
+    "checkout",
+    Date.now().toString(36),
+    Math.random().toString(36).slice(2),
+    Math.random().toString(36).slice(2)
+  ].join("-");
+}
+
+function createCheckoutRequestSignature(
+  orderRequest
+) {
+  const canonicalItems = [
+    ...(orderRequest.items || [])
+  ]
+    .map((item) => ({
+      productId: String(item?.id || ""),
+      quantity: Number(item?.quantity || 0)
+    }))
+    .sort((left, right) =>
+      left.productId.localeCompare(
+        right.productId
+      )
+    );
+
+  return JSON.stringify({
+    customer: orderRequest.customer,
+    items: canonicalItems,
+    paymentMethod: "cod"
+  });
+}
+
+function getCheckoutIdempotencyKey(
+  orderRequest
+) {
+  const signature =
+    createCheckoutRequestSignature(
+      orderRequest
+    );
+
+  try {
+    const stored = JSON.parse(
+      sessionStorage.getItem(
+        CHECKOUT_IDEMPOTENCY_STORAGE_KEY
+      ) || "null"
+    );
+
+    if (
+      stored?.signature === signature &&
+      typeof stored?.key === "string" &&
+      stored.key.length >= 16 &&
+      stored.key.length <= 128
+    ) {
+      return stored.key;
+    }
+
+    const key =
+      createCheckoutIdempotencyKey();
+
+    sessionStorage.setItem(
+      CHECKOUT_IDEMPOTENCY_STORAGE_KEY,
+      JSON.stringify({
+        key,
+        signature
+      })
+    );
+
+    return key;
+  } catch {
+    return createCheckoutIdempotencyKey();
+  }
+}
+
+function clearCheckoutIdempotencyKey() {
+  try {
+    sessionStorage.removeItem(
+      CHECKOUT_IDEMPOTENCY_STORAGE_KEY
+    );
+  } catch {
+    // An already-created order must not fail
+    // because storage cleanup failed.
+  }
+}
 
 function readSavedAddress() {
   try {
@@ -186,30 +295,12 @@ function Checkout() {
         });
       }
 
-      const validatedSubtotal = validatedItems.reduce(
-        (sum, item) =>
-          sum +
-          Number(item.price || 0) *
-            Number(item.quantity || 1),
-        0
-      );
-
-      const validatedShippingCharge =
-        validatedSubtotal >= 999 ||
-        validatedSubtotal === 0
-          ? 0
-          : 79;
-
-      const validatedGrandTotal =
-        validatedSubtotal +
-        validatedShippingCharge;
-
       localStorage.setItem(
         ADDRESS_KEY,
         JSON.stringify(form)
       );
 
-      const newOrder = await placeOrder({
+      const orderRequest = {
         customer: {
           name: form.name.trim(),
           phone: form.phone.trim(),
@@ -221,12 +312,20 @@ function Checkout() {
             pin: form.pin.trim()
           }
         },
-        items: validatedItems,
-        subtotal: validatedSubtotal,
-        shippingCharge: validatedShippingCharge,
-        total: validatedGrandTotal,
-        payment: "Cash on Delivery"
+        items: validatedItems
+      };
+
+      const idempotencyKey =
+        getCheckoutIdempotencyKey(
+          orderRequest
+        );
+
+      const newOrder = await placeOrder({
+        ...orderRequest,
+        idempotencyKey
       });
+
+      clearCheckoutIdempotencyKey();
 
       clearCart();
 
