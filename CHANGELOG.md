@@ -4,6 +4,41 @@ All notable changes to this project will be documented here.
 
 ## Unreleased
 
+<!-- FUNCTIONS_EMULATOR_READINESS_20260807 -->
+
+### Firebase Functions Emulator Readiness
+
+#### Added
+- Separated reusable Express app startup from the standalone local server.
+- Added `backend/server.js` with local-only `.env.server.local` loading.
+- Added Firebase Authentication, Firestore, Functions, and Hosting emulator configuration.
+- Added `scripts/termux-firebase-emulators.sh` for Termux-safe local emulator startup.
+- Added seven runtime-readiness automated tests.
+
+#### Security
+- Emulator launcher uses only `demo-avsilks-local`.
+- No production deploy command is included.
+- Firebase Functions SDK shebang is patched only temporarily during local emulator execution.
+- Original SDK bytes are restored and SHA-256 verified on shutdown.
+- `backend/.env.server.local` remains ignored and untracked.
+- Reserved `backend/.env` must remain absent.
+
+#### Verified
+- Backend automated tests: **183/183 PASS**.
+- Frontend production build: PASS.
+- Authentication Emulator: PASS.
+- Firestore Emulator: PASS.
+- Functions Emulator: PASS.
+- Hosting Emulator: PASS.
+- Hosting `/api/health`: HTTP 200.
+- Direct Functions `/api/health`: HTTP 200.
+- Unauthenticated order creation: HTTP 401.
+- Accidental order documents created: zero.
+- Gitleaks history scan: PASS.
+- Gitleaks candidate-source scan: PASS.
+- Production deployment performed: No.
+- Production Firestore rules deployed: No.
+
 ### Security
 - Completed Phase 0 Security Recovery Gate.
 - Rotated Razorpay Test API Keys.
