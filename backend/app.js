@@ -7,6 +7,9 @@ const {
   createOrderRouter,
 } = require("./src/routes/order.routes");
 const {
+  createAuthRouter,
+} = require("./src/routes/auth.routes");
+const {
   validateRbacConfiguration,
 } = require("./src/constants/validateRbac");
 
@@ -37,6 +40,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.use("/api/auth", createAuthRouter());
 app.use("/api/products", productRoutes);
 app.use("/api/orders", createOrderRouter());
 
