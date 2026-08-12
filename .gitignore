@@ -35,3 +35,7 @@ old-root-app/
 *.before-*
 *.original
 avsilks-backups/
+
+# Prevent accidental source backup commits
+*-backup
+**/.backups/
