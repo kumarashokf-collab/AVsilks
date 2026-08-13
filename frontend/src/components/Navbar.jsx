@@ -17,14 +17,12 @@ import { signOut } from "firebase/auth";
 
 import { auth } from "../firebase";
 import { useCart } from "../context/CartContext";
-import { STORE } from "../constants/store";
 import { BRAND } from "../config/branding";
-import { getUserRole } from "../constants/admin";
 import { ROLES } from "../constants/roles";
 import logo from "../assets/logo.png";
 import "./Navbar.css";
 
-function Navbar({ user }) {
+function Navbar({ user, trustedSession }) {
   const [isOpen, setIsOpen] = useState(false);
   const { cart = [] } = useCart();
   const navigate = useNavigate();
@@ -34,7 +32,7 @@ function Navbar({ user }) {
     0
   );
 
-  const isAdmin = getUserRole(user) === ROLES.ADMIN;
+  const isAdmin = trustedSession?.role === ROLES.ADMIN;
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";

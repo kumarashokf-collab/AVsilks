@@ -4,6 +4,37 @@ All notable changes to this project will be documented here.
 
 ## Unreleased
 
+<!-- FRONTEND_TRUSTED_AUTH_SESSION_20260813 -->
+
+### Frontend Trusted Backend Auth Session
+
+#### Added
+- Added a centralized frontend API base URL service.
+- Added trusted frontend session resolution through authenticated `GET /api/auth/me`.
+- Added Firebase ID-token forwarding through the `Authorization: Bearer` header.
+- Added trusted `{ uid, role }` session propagation to application routing, navigation, and order administration UI.
+
+#### Security
+- Removed the hardcoded frontend admin phone allowlist.
+- Removed client-derived `getUserRole` and `isAdminUser` authorization decisions.
+- Admin UI access now depends on the backend-verified trusted role.
+- Trusted session responses are rejected when the backend UID does not match the authenticated Firebase UID.
+- Invalid or missing trusted roles fail closed without granting admin access.
+- Removed all active frontend references to the legacy phone-based RBAC module.
+
+#### Architecture
+- Centralized API base URL resolution in `frontend/src/services/api.js`.
+- Added trusted session handling in `frontend/src/services/authSession.js`.
+- Reused the centralized API helper from the order context instead of maintaining duplicate API-base logic.
+
+#### Verified
+- Frontend project-wide lint: **0 errors**.
+- Frontend production build: **PASS** with 86 modules transformed.
+- Backend automated regression tests: **189/189 PASS**.
+- Legacy frontend phone-based RBAC reference scan: **PASS (zero references)**.
+- Git staged whitespace/integrity check: **PASS**.
+- Pre-staging and staged secret scans: **PASS**.
+
 <!-- FUNCTIONS_EMULATOR_READINESS_20260807 -->
 
 ### Firebase Functions Emulator Readiness

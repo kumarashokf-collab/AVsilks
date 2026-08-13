@@ -18,7 +18,7 @@ const OrderDetails = lazy(() => import("./pages/orders/OrderDetails"));
 import { CartProvider } from "./context/CartContext";
 import { ProductProvider } from "./context/ProductContext";
 import { OrderProvider } from "./context/OrderContext";
-import { getUserRole } from "./constants/admin";
+import { fetchTrustedAuthSession } from "./services/authSession";
 import { ROLES } from "./constants/roles";
 import { BRAND } from "./config/branding";
 
@@ -27,12 +27,12 @@ function RequireAuth({ user, children }) {
   return children;
 }
 
-function RequireAdmin({ user, children }) {
+function RequireAdmin({ user, trustedSession, children }) {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (getUserRole(user) !== ROLES.ADMIN) {
+  if (trustedSession?.role !== ROLES.ADMIN) {
     return <Navigate to="/" replace />;
   }
 
@@ -41,14 +41,58 @@ function RequireAdmin({ user, children }) {
 
 function App() {
   const [user, setUser] = useState(null);
+  const [trustedSession, setTrustedSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    let active = true;
+
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!active) {
+        return;
+      }
+
+      setAuthLoading(true);
       setUser(currentUser);
-      setAuthLoading(false);
+      setTrustedSession(null);
+
+      if (!currentUser) {
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const session = await fetchTrustedAuthSession(currentUser);
+
+        if (
+          active &&
+          auth.currentUser?.uid === currentUser.uid
+        ) {
+          setTrustedSession(session);
+        }
+      } catch (error) {
+        console.error(
+          "Trusted authentication session failed:",
+          error
+        );
+
+        if (active) {
+          setTrustedSession(null);
+        }
+      } finally {
+        if (
+          active &&
+          auth.currentUser?.uid === currentUser.uid
+        ) {
+          setAuthLoading(false);
+        }
+      }
     });
-    return unsubscribe;
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   if (authLoading) {
@@ -63,11 +107,11 @@ function App() {
   }
 
   return (
-    <OrderProvider user={user}>
+    <OrderProvider user={user} trustedSession={trustedSession}>
       <ProductProvider>
         <CartProvider>
           <Router>
-            <Navbar user={user} />
+            <Navbar user={user} trustedSession={trustedSession} />
             <Suspense
               fallback={
                 <div
@@ -88,13 +132,13 @@ function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+              <Route path="/login" element={user ? <Navigate to={trustedSession?.role === ROLES.ADMIN ? "/admin" : "/"} replace /> : <Login />} />
               <Route path="/checkout" element={<RequireAuth user={user}><Checkout /></RequireAuth>} />
               <Route path="/orders" element={<RequireAuth user={user}><MyOrders /></RequireAuth>} />
               <Route path="/orders/:id" element={<RequireAuth user={user}><OrderDetails /></RequireAuth>} />
               <Route path="/profile" element={<RequireAuth user={user}><Profile user={user} /></RequireAuth>} />
               <Route path="/settings" element={<RequireAuth user={user}><Settings /></RequireAuth>} />
-              <Route path="/admin" element={<RequireAdmin user={user}><Admin /></RequireAdmin>} />
+              <Route path="/admin" element={<RequireAdmin user={user} trustedSession={trustedSession}><Admin /></RequireAdmin>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>

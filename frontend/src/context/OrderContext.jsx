@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase";
-import { getUserRole } from "../constants/admin";
+import { getApiBaseUrl } from "../services/api";
 import { ROLES } from "../constants/roles";
 
 const OrderContext = createContext(null);
@@ -60,22 +60,9 @@ function normalizeItems(items) {
   }));
 }
 
-function getApiBaseUrl() {
-  const configuredBaseUrl =
-    import.meta.env.PROD
-      ? "/api"
-      : (
-          import.meta.env.VITE_API_BASE_URL ||
-          "/api"
-        );
-
-  return String(configuredBaseUrl)
-    .trim()
-    .replace(/\/+$/, "");
-}
-
 export function OrderProvider({
   user,
+  trustedSession,
   children
 }) {
   const [orders, setOrders] = useState([]);
@@ -85,8 +72,8 @@ export function OrderProvider({
     useState("");
 
   const admin = useMemo(
-    () => getUserRole(user) === ROLES.ADMIN,
-    [user]
+    () => trustedSession?.role === ROLES.ADMIN,
+    [trustedSession]
   );
 
   useEffect(() => {

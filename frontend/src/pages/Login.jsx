@@ -3,16 +3,12 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber
 } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
 
 import { auth } from "../firebase";
 import logo from "../assets/logo.png";
 import { BRAND } from "../config/branding";
-import { getUserRole } from "../constants/admin";
-import { ROLES } from "../constants/roles";
 
 function Login() {
-  const navigate = useNavigate();
 
   const verifierRef = useRef(null);
 
@@ -140,19 +136,9 @@ function Login() {
     setLoading(true);
 
     try {
-      const result = await confirmationResult.confirm(otp);
+      await confirmationResult.confirm(otp);
 
       clearRecaptcha();
-
-      if (getUserRole(result.user) === ROLES.ADMIN) {
-        navigate("/admin", {
-          replace: true
-        });
-      } else {
-        navigate("/", {
-          replace: true
-        });
-      }
     } catch (error) {
       console.error("OTP verification failed:", error);
 
