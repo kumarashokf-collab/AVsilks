@@ -26,6 +26,7 @@ All notable changes to this project will be documented here.
 - Centralized API base URL resolution in `frontend/src/services/api.js`.
 - Added trusted session handling in `frontend/src/services/authSession.js`.
 - Reused the centralized API helper from the order context instead of maintaining duplicate API-base logic.
+- Added environment-gated Firebase Authentication and Firestore emulator wiring in `frontend/src/firebase.js`; emulator connections activate only when `VITE_USE_FIREBASE_EMULATORS=true`.
 
 #### Verified
 - Frontend project-wide lint: **0 errors**.
@@ -34,6 +35,18 @@ All notable changes to this project will be documented here.
 - Legacy frontend phone-based RBAC reference scan: **PASS (zero references)**.
 - Git staged whitespace/integrity check: **PASS**.
 - Pre-staging and staged secret scans: **PASS**.
+
+<!-- TRUSTED_AUTH_RUNTIME_VERIFICATION_20260813 -->
+- Local Hosting → Functions `/api/health` runtime check: **HTTP 200 PASS**.
+- Auth + Firestore + Functions trusted-admin runtime session check: **PASS**.
+- Missing trusted role safely defaulted to `customer`: **PASS**.
+- Browser Phone OTP → Firebase authentication → trusted `/api/auth/me` → `/admin` redirect: **PASS**.
+- Emulator shutdown restored the temporary Firebase Functions SDK change exactly by SHA-256: **PASS**.
+- Final emulator process/port cleanup: **PASS**.
+- Production Firebase configuration is stored only in ignored local environment configuration with mode `600`: **PASS**.
+- Fresh production build: **PASS** with 86 modules transformed.
+- Production bundle contains the production Firebase project/auth configuration and contains no demo project, Auth emulator, or Firestore emulator endpoints: **PASS**.
+- Final tracked-secret, pending-diff-secret, and production-env tracking checks: **PASS**.
 
 <!-- FUNCTIONS_EMULATOR_READINESS_20260807 -->
 
