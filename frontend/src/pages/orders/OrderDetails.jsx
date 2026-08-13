@@ -14,6 +14,7 @@ import { useCart } from "../../context/CartContext";
 import OrderStatusBadge from "../../components/orders/OrderStatusBadge";
 import "../../components/orders/orders.css";
 import { formatOrderDate } from "../../utils/formatOrderDate";
+import { BRAND } from "../../config/branding";
 
 const FALLBACK_IMAGE =
   "data:image/svg+xml;charset=UTF-8," +
@@ -22,7 +23,7 @@ const FALLBACK_IMAGE =
       <rect width="300" height="380" fill="#f7f1ec"/>
       <text x="150" y="175" text-anchor="middle"
         font-family="Arial" font-size="30" fill="#6b2d2d">
-        AV Silks
+        ${BRAND.name}
       </text>
       <text x="150" y="215" text-anchor="middle"
         font-family="Arial" font-size="15" fill="#8b6f63">
@@ -197,7 +198,7 @@ function OrderDetails() {
                           }
                           alt={
                             item.name ||
-                            "AV Silks product"
+                            `${BRAND.name} product`
                           }
                           loading="lazy"
                           decoding="async"
@@ -207,7 +208,7 @@ function OrderDetails() {
                         <div>
                           <h3>
                             {item.name ||
-                              "AV Silks Saree"}
+                              `${BRAND.name} Saree`}
                           </h3>
 
                           <p>

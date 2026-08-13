@@ -17,6 +17,7 @@ import {
 import { db } from "../firebase";
 import { getApiBaseUrl } from "../services/api";
 import { ROLES } from "../constants/roles";
+import { BRAND } from "../config/branding";
 
 const OrderContext = createContext(null);
 
@@ -40,7 +41,7 @@ function normalizeItems(items) {
   return items.map((item) => ({
     id: String(item?.id || ""),
     name: String(
-      item?.name || "AV Silks Saree"
+      item?.name || `${BRAND.name} Saree`
     ),
     price: Number(item?.price || 0),
     quantity: Math.max(

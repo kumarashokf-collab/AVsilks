@@ -1,6 +1,6 @@
 import "./HeroSection.css";
 import { Link } from "react-router-dom";
-import { STORE } from "../../constants/store";
+import { BRAND } from "../../config/branding";
 import heroImage from "../../assets/silk-hero.webp";
 
 function HeroSection() {
@@ -13,7 +13,7 @@ function HeroSection() {
           </p>
 
           <h1 className="hero__title">
-            {STORE.tagline}
+            {BRAND.tagline}
           </h1>
 
           <p className="hero__description">
@@ -43,7 +43,7 @@ function HeroSection() {
           <div className="hero__image-frame">
             <img
               src={heroImage}
-              alt="AV Silks traditional saree collection"
+              alt={`${BRAND.name} traditional saree collection`}
               loading="lazy"
               decoding="async"
               className="hero__image"

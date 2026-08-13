@@ -1,5 +1,7 @@
+import { BRAND } from "./branding";
+
 export const THEME = {
-  name: "AV Silks Classic",
+  name: `${BRAND.name} Classic`,
 
   mode: "light",
 

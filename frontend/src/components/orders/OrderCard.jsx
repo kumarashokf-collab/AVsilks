@@ -8,6 +8,7 @@ import {
 
 import OrderStatusBadge from "./OrderStatusBadge";
 import { formatOrderDate } from "../../utils/formatOrderDate";
+import { BRAND } from "../../config/branding";
 import "./orders.css";
 
 const FALLBACK_IMAGE =
@@ -17,7 +18,7 @@ const FALLBACK_IMAGE =
       <rect width="240" height="300" fill="#f7f1ec"/>
       <text x="120" y="140" text-anchor="middle"
         font-family="Arial" font-size="24" fill="#6b2d2d">
-        AV Silks
+        ${BRAND.name}
       </text>
       <text x="120" y="175" text-anchor="middle"
         font-family="Arial" font-size="13" fill="#8b6f63">
@@ -41,7 +42,7 @@ function normalizeOrder(order) {
     total: Number(order?.price || order?.total || 0),
     customerName:
       order?.customer?.name ||
-      "AV Silks Customer",
+      `${BRAND.name} Customer`,
     city:
       order?.customer?.address?.city ||
       "",
@@ -53,7 +54,7 @@ function normalizeOrder(order) {
     title:
       order?.product ||
       firstItem?.name ||
-      "AV Silks Order",
+      `${BRAND.name} Order`,
     image:
       firstItem?.image ||
       firstItem?.imageUrl ||

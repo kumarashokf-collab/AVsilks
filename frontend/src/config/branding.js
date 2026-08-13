@@ -1,14 +1,19 @@
+import logoAsset from "../assets/logo.png";
+
+const brandName = "AV Silks";
+
 export const BRAND = {
-  name: "AV Silks",
+  name: brandName,
   shortName: "AV",
   tagline: "Six Yards of Heritage",
 
-  logo: "/logo.png",
+  logo: logoAsset,
+  favicon: "/favicon.svg",
 
-  copyright: `© ${new Date().getFullYear()} AV Silks. All Rights Reserved.`,
+  copyright: `© ${new Date().getFullYear()} ${brandName}. All Rights Reserved.`,
 
   company: {
-    legalName: "AV Silks",
+    legalName: brandName,
     country: "India"
   }
 };

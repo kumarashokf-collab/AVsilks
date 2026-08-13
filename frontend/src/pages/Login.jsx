@@ -5,7 +5,6 @@ import {
 } from "firebase/auth";
 
 import { auth } from "../firebase";
-import logo from "../assets/logo.png";
 import { BRAND } from "../config/branding";
 
 function Login() {
@@ -197,7 +196,7 @@ function Login() {
         }}
       >
         <img
-          src={logo}
+          src={BRAND.logo}
           alt={BRAND.name}
           loading="eager"
           decoding="async"

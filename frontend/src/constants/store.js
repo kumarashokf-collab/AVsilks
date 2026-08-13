@@ -1,13 +1,11 @@
-export const STORE = {
-  name: "AV Silks",
-  shortName: "AV",
-  tagline: "Six Yards of Heritage",
+import { BRAND } from "../config/branding";
 
+export const STORE = {
   description:
     "Traditional and contemporary sarees selected with care for every celebration.",
 
   address: {
-    line1: "AV Silks",
+    line1: BRAND.name,
     city: "Your City",
     state: "Andhra Pradesh",
     country: "India",
@@ -55,7 +53,7 @@ export const STORE = {
     {
       id: "new-arrivals",
       name: "New Arrivals",
-      description: "The latest additions to AV Silks"
+      description: `The latest additions to ${BRAND.name}`
     }
   ],
 

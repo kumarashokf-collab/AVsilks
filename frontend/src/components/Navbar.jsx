@@ -19,7 +19,6 @@ import { auth } from "../firebase";
 import { useCart } from "../context/CartContext";
 import { BRAND } from "../config/branding";
 import { ROLES } from "../constants/roles";
-import logo from "../assets/logo.png";
 import "./Navbar.css";
 
 function Navbar({ user, trustedSession }) {
@@ -87,7 +86,7 @@ function Navbar({ user, trustedSession }) {
             aria-label={`${BRAND.name} home`}
           >
             <img
-              src={logo}
+              src={BRAND.logo}
               className="site-header__logo"
               alt=""
               loading="eager"
@@ -169,7 +168,7 @@ function Navbar({ user, trustedSession }) {
             onClick={closeDrawer}
           >
             <img
-              src={logo}
+              src={BRAND.logo}
               alt=""
               loading="eager"
               decoding="async"

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
+import { BRAND } from '../config/branding';
 
 function PrivacyPolicy() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function PrivacyPolicy() {
       
       <div style={{ padding: "20px", color: "#444", lineHeight: "1.6", fontSize: "14px" }}>
         <h4 style={{ color: "#333" }}>1. Introduction</h4>
-        <p>AV Silks (ఏవీ సిల్క్స్) కు స్వాగతం. మీ వ్యక్తిగత గోప్యతను (Privacy) రక్షించడానికి మేము కట్టుబడి ఉన్నాము. యాప్ ద్వారా సేకరించిన మీ డేటా సురక్షితంగా ఉంటుంది.</p>
+        <p>{BRAND.name} కు స్వాగతం. మీ వ్యక్తిగత గోప్యతను (Privacy) రక్షించడానికి మేము కట్టుబడి ఉన్నాము. యాప్ ద్వారా సేకరించిన మీ డేటా సురక్షితంగా ఉంటుంది.</p>
         
         <h4 style={{ color: "#333" }}>2. Data Collection & Usage</h4>
         <p>ఆర్డర్ డెలివరీ కోసం మీ పేరు, ఫోన్ నంబర్, మరియు అడ్రస్ మాత్రమే సేకరించబడుతుంది. మీ డేటాను మేము ఏ థర్డ్-పార్టీ సంస్థలకు విక్రయించము.</p>
@@ -28,7 +29,7 @@ function PrivacyPolicy() {
         <h4 style={{ color: "#333" }}>4. App Security</h4>
         <p>మీ ఆర్డర్స్ మరియు ప్రొఫైల్ వివరాలు 4-డిజిట్ పిన్ (Security Lock) ద్వారా భద్రపరచబడ్డాయి.</p>
         
-        <p style={{ marginTop: "30px", fontWeight: "bold", textAlign: "center", color: "#888" }}>© 2026 AV Silks. All Rights Reserved.</p>
+        <p style={{ marginTop: "30px", fontWeight: "bold", textAlign: "center", color: "#888" }}>{BRAND.copyright}</p>
       </div>
     </div>
   );

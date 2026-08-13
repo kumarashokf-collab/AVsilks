@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import SearchAI from "../components/SearchAI";
 import { useProducts } from "../context/ProductContext";
+import { BRAND } from "../config/branding";
 
 function Products() {
   const {
@@ -64,7 +65,7 @@ function Products() {
           }}
         >
           <p className="section__eyebrow">
-            AV Silks Collection
+            {BRAND.name} Collection
           </p>
 
           <h1 style={{ marginBottom: "8px" }}>

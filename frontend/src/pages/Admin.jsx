@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { useProducts } from "../context/ProductContext";
 import { useOrders } from "../context/OrderContext";
+import { BRAND } from "../config/branding";
 
 const EMPTY_PRODUCT = {
   name: "",
@@ -548,7 +549,7 @@ function Admin() {
                 <div style={{ marginBottom: "var(--space-3)" }}>
                   <div>
                     <FaUser /> Customer:{" "}
-                    {order.customerName || "AV Silks Buyer"}
+                    {order.customerName || `${BRAND.name} Buyer`}
                   </div>
 
                   <div

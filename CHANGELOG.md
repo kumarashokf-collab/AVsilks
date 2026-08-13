@@ -48,6 +48,28 @@ All notable changes to this project will be documented here.
 - Production bundle contains the production Firebase project/auth configuration and contains no demo project, Auth emulator, or Firestore emulator endpoints: **PASS**.
 - Final tracked-secret, pending-diff-secret, and production-env tracking checks: **PASS**.
 
+
+<!-- WHITE_LABEL_FOUNDATION_20260814 -->
+
+### White-Label Brand Foundation
+
+#### Added
+- Established `frontend/src/config/branding.js` as the authoritative public brand identity source.
+- Centralized brand name, short name, tagline, bundled logo, favicon, legal identity and copyright metadata.
+- Centralized Navbar, Login, Hero, Products, Privacy, Cart, Security Lock, order UI and fallback labels on `BRAND`.
+- Derived Store address/content and Theme display identity from the centralized brand configuration.
+
+#### Architecture
+- Separated public brand identity from stable technical namespaces such as local-storage keys, emulator project IDs, upload filenames and storage folders.
+- Preserved `CONTACT` as a separately replaceable deployment contact configuration.
+- Preserved commerce/navigation/category content in `STORE` while removing duplicate top-level brand identity fields.
+
+#### Verified
+- Customer-visible hardcoded public brand scan outside `branding.js`: **PASS**.
+- Changed-file lint: **0 errors**; three pre-existing non-blocking warnings remain in CartContext, OrderContext and Admin.
+- Frontend production build: **PASS** with 86 modules transformed.
+- Git whitespace/integrity check: **PASS**.
+
 <!-- FUNCTIONS_EMULATOR_READINESS_20260807 -->
 
 ### Firebase Functions Emulator Readiness

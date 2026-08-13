@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 
 import { useCart } from "../context/CartContext";
+import { BRAND } from "../config/branding";
 import "./Cart.css";
 
 const FALLBACK_IMAGE =
@@ -16,7 +17,7 @@ const FALLBACK_IMAGE =
       <rect width="300" height="360" fill="#f7f1ec"/>
       <text x="150" y="170" text-anchor="middle"
         font-family="Arial" font-size="28" fill="#6b2d2d">
-        AV Silks
+        ${BRAND.name}
       </text>
       <text x="150" y="210" text-anchor="middle"
         font-family="Arial" font-size="15" fill="#8b6f63">

@@ -5,6 +5,7 @@ import {
   useMemo,
   useState
 } from "react";
+import { BRAND } from "../config/branding";
 
 const CartContext = createContext(null);
 const STORAGE_KEY = "avsilks_cart";
@@ -34,7 +35,7 @@ function readStoredCart() {
 function normalizeProduct(product) {
   return {
     id: product?.id,
-    name: product?.name || "AV Silks Saree",
+    name: product?.name || `${BRAND.name} Saree`,
     price: Number(product?.salePrice || product?.price || 0),
     image:
       product?.image ||
