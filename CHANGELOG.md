@@ -4,6 +4,54 @@ All notable changes to this project will be documented here.
 
 ## Unreleased
 
+<!-- QR_PROVENANCE_FOUNDATION_20260814 -->
+
+### QR Provenance Foundation
+
+#### Added
+- Added centralized provenance schema/status/field-limit policy.
+- Added strict Joi validation for artisan and provenance creation.
+- Added atomic artisan creation with canonical artisan-code reservation through `artisanCodes/{artisanCode}`.
+- Added atomic provenance creation through `provenanceRecords/{provenanceId}` with opaque public-ID reservation in `provenancePublicIds/{publicId}`.
+- Added atomic product linkage through `products/{productId}.provenanceId` and `publicProvenanceId`.
+- Added immutable product and artisan provenance snapshots for SKU, product name, artisan code, and artisan display name.
+- Added trusted Artisan and Provenance service, controller, and route layers.
+- Added protected `POST /api/artisans` and `POST /api/provenance` API routes.
+- Added Artisan and Provenance RBAC permission catalog entries.
+
+#### Security
+- Artisan and provenance writes require authenticated trusted backend sessions and explicit RBAC permissions.
+- Admin receives explicit Artisan and Provenance management permissions; customer and vendor roles do not receive provenance-management access.
+- Client-controlled audit fields, provenance status, public IDs, and product/artisan linkage overrides are rejected.
+- Artisan codes are transactionally reserved to prevent duplicate-code races.
+- Provenance creation fails atomically for missing/inactive artisans, missing products, already-linked products, and public-ID conflicts.
+- Artisan and provenance API responses use explicit allowlists and exclude internal audit metadata.
+- Firestore client access to `artisans`, `artisanCodes`, `provenanceRecords`, and `provenancePublicIds` remains denied by the default-deny rules posture.
+- Firebase deployment configuration references `frontend/firestore.rules`.
+- Worktree secret scan across all 23 modified/untracked QR Provenance candidate files: **PASS**.
+
+#### Architecture
+- Artisan identity and product provenance are stored in separate collections.
+- QR/public provenance identifiers are opaque and separate from internal provenance document IDs.
+- Provenance creation is backend-only and uses Firestore transactions.
+- Public QR verification is intentionally not exposed directly through Firestore; a sanitized backend verification flow remains pending.
+- Publish/archive lifecycle and public QR verification UI remain pending and are not claimed as completed by this foundation.
+
+#### Verified
+- Artisan repository tests: **3/3 PASS**.
+- Artisan service tests: **4/4 PASS**.
+- Artisan controller tests: **6/6 PASS**.
+- Artisan route tests: **4/4 PASS**.
+- Provenance repository tests: **6/6 PASS**.
+- Provenance service tests: **4/4 PASS**.
+- Provenance controller tests: **7/7 PASS**.
+- Provenance route tests: **4/4 PASS**.
+- App-mount and runtime integration gate: **19/19 PASS**.
+- Full backend automated regression suite: **231/231 PASS**.
+- RBAC configuration: **13 roles, 72 permissions, PASS**.
+- Git whitespace/integrity checks performed during implementation: **PASS**.
+- Production deployment performed for this foundation: **No**.
+
 <!-- FRONTEND_TRUSTED_AUTH_SESSION_20260813 -->
 
 ### Frontend Trusted Backend Auth Session

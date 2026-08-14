@@ -10,6 +10,12 @@ const {
   createAuthRouter,
 } = require("./src/routes/auth.routes");
 const {
+  createArtisanRouter,
+} = require("./src/routes/artisan.routes");
+const {
+  createProvenanceRouter,
+} = require("./src/routes/provenance.routes");
+const {
   validateRbacConfiguration,
 } = require("./src/constants/validateRbac");
 
@@ -43,5 +49,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", createAuthRouter());
 app.use("/api/products", productRoutes);
 app.use("/api/orders", createOrderRouter());
+app.use("/api/artisans", createArtisanRouter());
+app.use("/api/provenance", createProvenanceRouter());
 
 module.exports = app;
