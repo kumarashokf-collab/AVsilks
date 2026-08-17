@@ -87,6 +87,103 @@ function verifySignature({
   }
 }
 
+async function verifyCapturedRazorpayPayment(
+  {
+    razorpayOrderId,
+    razorpayPaymentId,
+    amountPaise,
+    currency,
+  },
+  dependencies = {}
+) {
+  const orderId =
+    normalizeText(razorpayOrderId);
+
+  const paymentId =
+    normalizeText(razorpayPaymentId);
+
+  const normalizedCurrency =
+    normalizeText(currency);
+
+  if (
+    !isRazorpayOrderId(orderId) ||
+    !isRazorpayPaymentId(paymentId) ||
+    !Number.isSafeInteger(amountPaise) ||
+    amountPaise <= 0 ||
+    !normalizedCurrency
+  ) {
+    throw createVerificationError(
+      RAZORPAY_VERIFICATION_ERROR
+        .INVALID_INPUT,
+      'Trusted Razorpay payment input is invalid.'
+    );
+  }
+
+  const fetchPayment =
+    dependencies.fetchPayment;
+
+  if (
+    typeof fetchPayment !== 'function'
+  ) {
+    throw createVerificationError(
+      RAZORPAY_VERIFICATION_ERROR
+        .INVALID_DEPENDENCIES,
+      'Razorpay payment fetch dependency is unavailable.'
+    );
+  }
+
+  const payment =
+    await fetchPayment(paymentId);
+
+  const fetchedPaymentId =
+    normalizeText(payment?.id);
+
+  const fetchedOrderId =
+    normalizeText(payment?.order_id);
+
+  const fetchedCurrency =
+    normalizeText(payment?.currency);
+
+  if (
+    fetchedPaymentId !== paymentId ||
+    fetchedOrderId !== orderId ||
+    payment?.amount !== amountPaise ||
+    fetchedCurrency !==
+      normalizedCurrency
+  ) {
+    throw createVerificationError(
+      RAZORPAY_VERIFICATION_ERROR
+        .PAYMENT_MISMATCH,
+      'Razorpay payment does not match the trusted payment session.'
+    );
+  }
+
+  if (
+    payment?.captured !== true ||
+    normalizeText(
+      payment?.status
+    ) !== 'captured'
+  ) {
+    throw createVerificationError(
+      RAZORPAY_VERIFICATION_ERROR
+        .PAYMENT_NOT_CAPTURED,
+      'Razorpay payment is not captured.'
+    );
+  }
+
+  return Object.freeze({
+    verified: true,
+    razorpayPaymentId:
+      paymentId,
+    razorpayOrderId:
+      orderId,
+    amountPaise,
+    currency:
+      normalizedCurrency,
+    status: 'captured',
+  });
+}
+
 async function verifyRazorpayPaymentAuthenticity(
   {
     storedRazorpayOrderId,
@@ -151,8 +248,7 @@ async function verifyRazorpayPaymentAuthenticity(
   }
 
   if (
-    clientOrderId !==
-    storedOrderId
+    clientOrderId !== storedOrderId
   ) {
     throw createVerificationError(
       RAZORPAY_VERIFICATION_ERROR
@@ -172,75 +268,22 @@ async function verifyRazorpayPaymentAuthenticity(
       normalizedSecret,
   });
 
-  const fetchPayment =
-    dependencies.fetchPayment;
-
-  if (
-    typeof fetchPayment !==
-    'function'
-  ) {
-    throw createVerificationError(
-      RAZORPAY_VERIFICATION_ERROR
-        .INVALID_DEPENDENCIES,
-      'Razorpay payment fetch dependency is unavailable.'
-    );
-  }
-
-  const payment =
-    await fetchPayment(paymentId);
-
-  const fetchedPaymentId =
-    normalizeText(payment?.id);
-
-  const fetchedOrderId =
-    normalizeText(payment?.order_id);
-
-  const fetchedCurrency =
-    normalizeText(payment?.currency);
-
-  if (
-    fetchedPaymentId !== paymentId ||
-    fetchedOrderId !==
-      storedOrderId ||
-    payment?.amount !==
-      amountPaise ||
-    fetchedCurrency !==
-      normalizedCurrency
-  ) {
-    throw createVerificationError(
-      RAZORPAY_VERIFICATION_ERROR
-        .PAYMENT_MISMATCH,
-      'Razorpay payment does not match the trusted payment session.'
-    );
-  }
-
-  if (
-    payment?.captured !== true ||
-    normalizeText(
-      payment?.status
-    ) !== 'captured'
-  ) {
-    throw createVerificationError(
-      RAZORPAY_VERIFICATION_ERROR
-        .PAYMENT_NOT_CAPTURED,
-      'Razorpay payment is not captured.'
-    );
-  }
-
-  return Object.freeze({
-    verified: true,
-    razorpayPaymentId:
-      paymentId,
-    razorpayOrderId:
-      storedOrderId,
-    amountPaise,
-    currency:
-      normalizedCurrency,
-    status: 'captured',
-  });
+  return verifyCapturedRazorpayPayment(
+    {
+      razorpayOrderId:
+        storedOrderId,
+      razorpayPaymentId:
+        paymentId,
+      amountPaise,
+      currency:
+        normalizedCurrency,
+    },
+    dependencies
+  );
 }
 
 module.exports = {
   RAZORPAY_VERIFICATION_ERROR,
+  verifyCapturedRazorpayPayment,
   verifyRazorpayPaymentAuthenticity,
 };

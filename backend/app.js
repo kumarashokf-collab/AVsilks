@@ -20,6 +20,9 @@ const {
   createPaymentRouter,
 } = require("./src/routes/payment.routes");
 const {
+  createRazorpayWebhookRouter,
+} = require("./src/routes/razorpayWebhook.routes");
+const {
   validateRbacConfiguration,
 } = require("./src/constants/validateRbac");
 
@@ -32,6 +35,12 @@ console.log("RBAC:", rbacStatus);
 console.log("RBAC configuration validated successfully.");
 
 app.use(helmet());
+
+app.use(
+  "/api/payments/razorpay/webhook",
+  createRazorpayWebhookRouter()
+);
+
 app.use(express.json());
 
 const apiRateLimiter = rateLimit({
