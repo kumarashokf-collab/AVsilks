@@ -5,6 +5,10 @@ const {
 } = require('node:crypto');
 
 const {
+  FieldValue,
+} = require('firebase-admin/firestore');
+
+const {
   PROVENANCE_SCHEMA_VERSION,
   PROVENANCE_STATUS,
 } = require(
@@ -39,6 +43,21 @@ const PROVENANCE_REPOSITORY_ERROR =
 
     INVALID_ARTISAN_DATA:
       'INVALID_ARTISAN_DATA',
+
+    PROVENANCE_NOT_FOUND:
+      'PROVENANCE_NOT_FOUND',
+
+    INVALID_STATUS_TRANSITION:
+      'INVALID_STATUS_TRANSITION',
+
+    PUBLIC_PROVENANCE_NOT_FOUND:
+      'PUBLIC_PROVENANCE_NOT_FOUND',
+
+    INVALID_PUBLIC_PROVENANCE_DATA:
+      'INVALID_PUBLIC_PROVENANCE_DATA',
+
+    INVALID_PROVENANCE_DATA:
+      'INVALID_PROVENANCE_DATA',
   });
 
 function createRepositoryError(
@@ -129,15 +148,15 @@ function resolveDependencies(
 
   const {
     db,
-    admin,
   } = require('../config/firebase');
 
   if (
     !db ||
     typeof db.runTransaction !==
       'function' ||
-    !admin?.firestore?.FieldValue
-      ?.serverTimestamp
+    typeof FieldValue
+      ?.serverTimestamp !==
+      'function'
   ) {
     throw createRepositoryError(
       PROVENANCE_REPOSITORY_ERROR
@@ -150,8 +169,7 @@ function resolveDependencies(
     db,
 
     serverTimestamp: () =>
-      admin.firestore.FieldValue
-        .serverTimestamp(),
+      FieldValue.serverTimestamp(),
 
     generateProvenanceId:
       defaultGenerateProvenanceId,
@@ -513,7 +531,508 @@ async function createProvenanceWithTransaction(
   );
 }
 
+
+function validateLifecycleInput(
+  adminUserId,
+  provenanceId,
+  nextStatus
+) {
+  const normalizedAdminUserId =
+    normalizeText(adminUserId);
+
+  const normalizedProvenanceId =
+    normalizeText(provenanceId);
+
+  const normalizedNextStatus =
+    normalizeText(nextStatus);
+
+  const validTargetStatus =
+    normalizedNextStatus ===
+      PROVENANCE_STATUS.PUBLISHED ||
+    normalizedNextStatus ===
+      PROVENANCE_STATUS.ARCHIVED;
+
+  if (
+    !normalizedAdminUserId ||
+    !normalizedProvenanceId ||
+    normalizedProvenanceId.includes('/') ||
+    !validTargetStatus
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_INPUT,
+      'Valid provenance lifecycle input is required.'
+    );
+  }
+
+  return {
+    adminUserId:
+      normalizedAdminUserId,
+
+    provenanceId:
+      normalizedProvenanceId,
+
+    nextStatus:
+      normalizedNextStatus,
+  };
+}
+
+function isAllowedStatusTransition(
+  currentStatus,
+  nextStatus
+) {
+  return (
+    (
+      currentStatus ===
+        PROVENANCE_STATUS.DRAFT &&
+      nextStatus ===
+        PROVENANCE_STATUS.PUBLISHED
+    ) ||
+    (
+      currentStatus ===
+        PROVENANCE_STATUS.PUBLISHED &&
+      nextStatus ===
+        PROVENANCE_STATUS.ARCHIVED
+    )
+  );
+}
+
+async function transitionProvenanceStatusWithTransaction(
+  {
+    adminUserId,
+    provenanceId,
+    nextStatus,
+  } = {},
+  dependencies = {}
+) {
+  const normalized =
+    validateLifecycleInput(
+      adminUserId,
+      provenanceId,
+      nextStatus
+    );
+
+  const {
+    db,
+    serverTimestamp,
+  } = resolveDependencies(
+    dependencies
+  );
+
+  const provenanceRef =
+    db.collection(
+      'provenanceRecords'
+    ).doc(
+      normalized.provenanceId
+    );
+
+  return db.runTransaction(
+    async (transaction) => {
+      const provenanceSnapshot =
+        await transaction.get(
+          provenanceRef
+        );
+
+      if (
+        !provenanceSnapshot.exists
+      ) {
+        throw createRepositoryError(
+          PROVENANCE_REPOSITORY_ERROR
+            .PROVENANCE_NOT_FOUND,
+          'Provenance record was not found.'
+        );
+      }
+
+      const provenanceData =
+        provenanceSnapshot.data() || {};
+
+      const currentStatus =
+        normalizeText(
+          provenanceData.status
+        );
+
+      if (
+        !isAllowedStatusTransition(
+          currentStatus,
+          normalized.nextStatus
+        )
+      ) {
+        throw createRepositoryError(
+          PROVENANCE_REPOSITORY_ERROR
+            .INVALID_STATUS_TRANSITION,
+          'Provenance status transition is not allowed.'
+        );
+      }
+
+      const timestamp =
+        serverTimestamp();
+
+      const updateData = {
+        status:
+          normalized.nextStatus,
+
+        updatedBy:
+          normalized.adminUserId,
+
+        updatedAt:
+          timestamp,
+      };
+
+      if (
+        normalized.nextStatus ===
+        PROVENANCE_STATUS.PUBLISHED
+      ) {
+        updateData.publishedAt =
+          timestamp;
+      }
+
+      if (
+        normalized.nextStatus ===
+        PROVENANCE_STATUS.ARCHIVED
+      ) {
+        updateData.archivedAt =
+          timestamp;
+      }
+
+      transaction.update(
+        provenanceRef,
+        updateData
+      );
+
+      return Object.freeze({
+        updated: true,
+
+        provenanceId:
+          normalized.provenanceId,
+
+        status:
+          normalized.nextStatus,
+      });
+    }
+  );
+}
+
+
+function resolvePublicReadDependencies(
+  dependencies = {}
+) {
+  const hasInjectedDependencies =
+    Object.keys(dependencies).length > 0;
+
+  if (hasInjectedDependencies) {
+    if (
+      !dependencies.db ||
+      typeof dependencies.db.collection !==
+        'function'
+    ) {
+      throw createRepositoryError(
+        PROVENANCE_REPOSITORY_ERROR
+          .INVALID_DEPENDENCIES,
+        'Firestore public provenance repository dependencies are invalid.'
+      );
+    }
+
+    return {
+      db: dependencies.db,
+    };
+  }
+
+  const {
+    db,
+  } = require('../config/firebase');
+
+  if (
+    !db ||
+    typeof db.collection !== 'function'
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_DEPENDENCIES,
+      'Firestore public provenance repository dependencies are invalid.'
+    );
+  }
+
+  return {
+    db,
+  };
+}
+
+function validatePublicProvenanceInput(
+  publicId
+) {
+  const normalizedPublicId =
+    normalizeText(publicId);
+
+  if (
+    !normalizedPublicId ||
+    normalizedPublicId.includes('/')
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_INPUT,
+      'Valid public provenance ID is required.'
+    );
+  }
+
+  return normalizedPublicId;
+}
+
+function createPublicNotFoundError() {
+  return createRepositoryError(
+    PROVENANCE_REPOSITORY_ERROR
+      .PUBLIC_PROVENANCE_NOT_FOUND,
+    'Public provenance was not found.'
+  );
+}
+
+async function getPublishedProvenanceByPublicId(
+  {
+    publicId,
+  } = {},
+  dependencies = {}
+) {
+  const normalizedPublicId =
+    validatePublicProvenanceInput(
+      publicId
+    );
+
+  const {
+    db,
+  } = resolvePublicReadDependencies(
+    dependencies
+  );
+
+  const publicIndexRef =
+    db.collection(
+      'provenancePublicIds'
+    ).doc(
+      normalizedPublicId
+    );
+
+  const publicIndexSnapshot =
+    await publicIndexRef.get();
+
+  if (
+    !publicIndexSnapshot.exists
+  ) {
+    throw createPublicNotFoundError();
+  }
+
+  const publicIndexData =
+    publicIndexSnapshot.data() || {};
+
+  const provenanceId =
+    normalizeText(
+      publicIndexData.provenanceId
+    );
+
+  const indexedPublicId =
+    normalizeText(
+      publicIndexData.publicId
+    );
+
+  if (
+    !provenanceId ||
+    provenanceId.includes('/') ||
+    indexedPublicId !==
+      normalizedPublicId
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_PUBLIC_PROVENANCE_DATA,
+      'Public provenance index data is invalid.'
+    );
+  }
+
+  const provenanceRef =
+    db.collection(
+      'provenanceRecords'
+    ).doc(
+      provenanceId
+    );
+
+  const provenanceSnapshot =
+    await provenanceRef.get();
+
+  if (
+    !provenanceSnapshot.exists
+  ) {
+    throw createPublicNotFoundError();
+  }
+
+  const provenanceData =
+    provenanceSnapshot.data() || {};
+
+  if (
+    normalizeText(
+      provenanceData.publicId
+    ) !== normalizedPublicId
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_PUBLIC_PROVENANCE_DATA,
+      'Public provenance record data is invalid.'
+    );
+  }
+
+  if (
+    normalizeText(
+      provenanceData.status
+    ) !==
+    PROVENANCE_STATUS.PUBLISHED
+  ) {
+    throw createPublicNotFoundError();
+  }
+
+  return Object.freeze({
+    publicId:
+      normalizedPublicId,
+
+    provenance:
+      Object.freeze({
+        ...provenanceData,
+      }),
+  });
+}
+
+
+function validateManagementProvenanceInput(
+  provenanceId
+) {
+  const normalizedProvenanceId =
+    normalizeText(
+      provenanceId
+    );
+
+  if (
+    !normalizedProvenanceId ||
+    normalizedProvenanceId.includes('/') ||
+    normalizedProvenanceId.length > 128
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_INPUT,
+      'Valid provenance ID is required.'
+    );
+  }
+
+  return normalizedProvenanceId;
+}
+
+function validateStoredManagementProvenance(
+  provenanceData,
+  expectedProvenanceId
+) {
+  if (
+    !isPlainObject(
+      provenanceData
+    )
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_PROVENANCE_DATA,
+      'Stored provenance data is invalid.'
+    );
+  }
+
+  const storedId =
+    normalizeText(
+      provenanceData.id
+    );
+
+  const publicId =
+    normalizeText(
+      provenanceData.publicId
+    );
+
+  const status =
+    normalizeText(
+      provenanceData.status
+    );
+
+  const validStatuses =
+    new Set([
+      PROVENANCE_STATUS.DRAFT,
+      PROVENANCE_STATUS.PUBLISHED,
+      PROVENANCE_STATUS.ARCHIVED,
+    ]);
+
+  if (
+    storedId !== expectedProvenanceId ||
+    !publicId ||
+    publicId.includes('/') ||
+    !validStatuses.has(
+      status
+    )
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_PROVENANCE_DATA,
+      'Stored provenance data is invalid.'
+    );
+  }
+
+  return provenanceData;
+}
+
+async function getProvenanceById(
+  {
+    provenanceId,
+  } = {},
+  dependencies = {}
+) {
+  const normalizedProvenanceId =
+    validateManagementProvenanceInput(
+      provenanceId
+    );
+
+  const {
+    db,
+  } = resolvePublicReadDependencies(
+    dependencies
+  );
+
+  const provenanceRef =
+    db.collection(
+      'provenanceRecords'
+    ).doc(
+      normalizedProvenanceId
+    );
+
+  const provenanceSnapshot =
+    await provenanceRef.get();
+
+  if (
+    !provenanceSnapshot.exists
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .PROVENANCE_NOT_FOUND,
+      'Provenance record was not found.'
+    );
+  }
+
+  const provenanceData =
+    validateStoredManagementProvenance(
+      provenanceSnapshot.data() || {},
+      normalizedProvenanceId
+    );
+
+  return Object.freeze({
+    provenanceId:
+      normalizedProvenanceId,
+
+    provenance:
+      Object.freeze({
+        ...provenanceData,
+      }),
+  });
+}
+
 module.exports = {
   PROVENANCE_REPOSITORY_ERROR,
   createProvenanceWithTransaction,
+  transitionProvenanceStatusWithTransaction,
+  getPublishedProvenanceByPublicId,
+  getProvenanceById,
 };

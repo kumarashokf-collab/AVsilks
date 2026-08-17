@@ -16,7 +16,7 @@ import {
 
 import { db } from "../firebase";
 import { getApiBaseUrl } from "../services/api";
-import { ROLES } from "../constants/roles";
+import { isAdministrativeRole } from "../constants/roles";
 import { BRAND } from "../config/branding";
 
 const OrderContext = createContext(null);
@@ -73,7 +73,7 @@ export function OrderProvider({
     useState("");
 
   const admin = useMemo(
-    () => trustedSession?.role === ROLES.ADMIN,
+    () => isAdministrativeRole(trustedSession?.role),
     [trustedSession]
   );
 

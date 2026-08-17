@@ -14,12 +14,13 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const Products = lazy(() => import("./pages/Products"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const PublicProvenance = lazy(() => import("./pages/PublicProvenance"));
 const OrderDetails = lazy(() => import("./pages/orders/OrderDetails"));
 import { CartProvider } from "./context/CartContext";
 import { ProductProvider } from "./context/ProductContext";
 import { OrderProvider } from "./context/OrderContext";
 import { fetchTrustedAuthSession } from "./services/authSession";
-import { ROLES } from "./constants/roles";
+import { isAdministrativeRole } from "./constants/roles";
 import { BRAND } from "./config/branding";
 
 function RequireAuth({ user, children }) {
@@ -32,7 +33,7 @@ function RequireAdmin({ user, trustedSession, children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (trustedSession?.role !== ROLES.ADMIN) {
+  if (!isAdministrativeRole(trustedSession?.role)) {
     return <Navigate to="/" replace />;
   }
 
@@ -132,13 +133,14 @@ function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/login" element={user ? <Navigate to={trustedSession?.role === ROLES.ADMIN ? "/admin" : "/"} replace /> : <Login />} />
+              <Route path="/provenance/:publicId" element={<PublicProvenance />} />
+              <Route path="/login" element={user ? <Navigate to={isAdministrativeRole(trustedSession?.role) ? "/admin" : "/"} replace /> : <Login />} />
               <Route path="/checkout" element={<RequireAuth user={user}><Checkout /></RequireAuth>} />
               <Route path="/orders" element={<RequireAuth user={user}><MyOrders /></RequireAuth>} />
               <Route path="/orders/:id" element={<RequireAuth user={user}><OrderDetails /></RequireAuth>} />
               <Route path="/profile" element={<RequireAuth user={user}><Profile user={user} /></RequireAuth>} />
               <Route path="/settings" element={<RequireAuth user={user}><Settings /></RequireAuth>} />
-              <Route path="/admin" element={<RequireAdmin user={user} trustedSession={trustedSession}><Admin /></RequireAdmin>} />
+              <Route path="/admin" element={<RequireAdmin user={user} trustedSession={trustedSession}><Admin user={user} /></RequireAdmin>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>

@@ -84,6 +84,11 @@ function validateCreateOrderInput(payload) {
 module.exports = {
   MAX_ORDER_LINES,
   MAX_ITEM_QUANTITY,
+  productIdSchema,
+  orderItemSchema,
+  addressSchema,
+  customerSchema,
+  idempotencyKeySchema,
   createOrderSchema,
   validateCreateOrderInput,
 };

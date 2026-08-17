@@ -265,3 +265,66 @@ test(
     );
   }
 );
+
+
+test(
+  'uses modular FieldValue when the default Firebase admin namespace lacks legacy FieldValue',
+  async () => {
+    const fake =
+      createFakeFirestore();
+
+    const configPath =
+      require.resolve(
+        '../src/config/firebase'
+      );
+
+    const previousConfigModule =
+      require.cache[configPath];
+
+    require.cache[configPath] = {
+      id: configPath,
+      filename: configPath,
+      loaded: true,
+      exports: {
+        db: fake.db,
+
+        admin: {
+          firestore() {
+            return fake.db;
+          },
+        },
+      },
+    };
+
+    try {
+      const result =
+        await createArtisanWithTransaction(
+          createInput()
+        );
+
+      assert.equal(
+        result.created,
+        true
+      );
+
+      assert.equal(
+        fake.transactionCount,
+        1
+      );
+
+      assert.equal(
+        fake.operations.length,
+        2
+      );
+    } finally {
+      if (previousConfigModule) {
+        require.cache[configPath] =
+          previousConfigModule;
+      } else {
+        delete require.cache[
+          configPath
+        ];
+      }
+    }
+  }
+);

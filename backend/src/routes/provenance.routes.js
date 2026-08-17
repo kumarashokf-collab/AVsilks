@@ -29,12 +29,44 @@ function resolveProvenanceRouteDependencies(
       '../controllers/provenance.controller'
     ).createProvenance;
 
+  const publishProvenanceHandler =
+    dependencies.publishProvenanceHandler ||
+    require(
+      '../controllers/provenance.controller'
+    ).publishProvenance;
+
+  const archiveProvenanceHandler =
+    dependencies.archiveProvenanceHandler ||
+    require(
+      '../controllers/provenance.controller'
+    ).archiveProvenance;
+
+  const getProvenanceHandler =
+    dependencies.getProvenanceHandler ||
+    require(
+      '../controllers/provenance.controller'
+    ).getProvenance;
+
+  const verifyPublicProvenanceHandler =
+    dependencies.verifyPublicProvenanceHandler ||
+    require(
+      '../controllers/provenance.controller'
+    ).verifyPublicProvenance;
+
   if (
     typeof verifyAuthMiddleware !==
       'function' ||
     typeof requirePermissionFn !==
       'function' ||
     typeof createProvenanceHandler !==
+      'function' ||
+    typeof publishProvenanceHandler !==
+      'function' ||
+    typeof archiveProvenanceHandler !==
+      'function' ||
+    typeof getProvenanceHandler !==
+      'function' ||
+    typeof verifyPublicProvenanceHandler !==
       'function'
   ) {
     throw new TypeError(
@@ -46,6 +78,10 @@ function resolveProvenanceRouteDependencies(
     verifyAuthMiddleware,
     requirePermissionFn,
     createProvenanceHandler,
+    publishProvenanceHandler,
+    archiveProvenanceHandler,
+    getProvenanceHandler,
+    verifyPublicProvenanceHandler,
   };
 }
 
@@ -56,9 +92,23 @@ function createProvenanceRouter(
     verifyAuthMiddleware,
     requirePermissionFn,
     createProvenanceHandler,
+    publishProvenanceHandler,
+    archiveProvenanceHandler,
+    getProvenanceHandler,
+    verifyPublicProvenanceHandler,
   } =
     resolveProvenanceRouteDependencies(
       dependencies
+    );
+
+  const publishPermissionMiddleware =
+    requirePermissionFn(
+      PERMISSIONS.PROVENANCE_PUBLISH
+    );
+
+  const archivePermissionMiddleware =
+    requirePermissionFn(
+      PERMISSIONS.PROVENANCE_ARCHIVE
     );
 
   const createPermissionMiddleware =
@@ -66,9 +116,20 @@ function createProvenanceRouter(
       PERMISSIONS.PROVENANCE_CREATE
     );
 
+  const readPermissionMiddleware =
+    requirePermissionFn(
+      PERMISSIONS.PROVENANCE_READ
+    );
+
   if (
     typeof createPermissionMiddleware !==
-    'function'
+      'function' ||
+    typeof publishPermissionMiddleware !==
+      'function' ||
+    typeof archivePermissionMiddleware !==
+      'function' ||
+    typeof readPermissionMiddleware !==
+      'function'
   ) {
     throw new TypeError(
       'Provenance permission middleware must be a function.'
@@ -82,6 +143,32 @@ function createProvenanceRouter(
     verifyAuthMiddleware,
     createPermissionMiddleware,
     createProvenanceHandler
+  );
+
+  router.post(
+    '/:id/publish',
+    verifyAuthMiddleware,
+    publishPermissionMiddleware,
+    publishProvenanceHandler
+  );
+
+  router.post(
+    '/:id/archive',
+    verifyAuthMiddleware,
+    archivePermissionMiddleware,
+    archiveProvenanceHandler
+  );
+
+  router.get(
+    '/public/:publicId',
+    verifyPublicProvenanceHandler
+  );
+
+  router.get(
+    '/:id',
+    verifyAuthMiddleware,
+    readPermissionMiddleware,
+    getProvenanceHandler
   );
 
   return router;

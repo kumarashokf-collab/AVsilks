@@ -12,14 +12,20 @@ const SHIPPING_POLICY = Object.freeze({
 
 const PAYMENT_METHOD = Object.freeze({
   COD: 'cod',
+  RAZORPAY: 'razorpay',
 });
 
 const PAYMENT_LABEL = Object.freeze({
   COD: 'Cash on Delivery',
+  RAZORPAY: 'Razorpay',
 });
 
 const PAYMENT_STATUS = Object.freeze({
   PENDING_ON_DELIVERY: 'Pending on Delivery',
+  PENDING_PAYMENT: 'Pending Payment',
+  PAID: 'Paid',
+  FAILED: 'Failed',
+  EXPIRED: 'Expired',
 });
 
 const ORDER_CURRENCY = 'INR';

@@ -8,6 +8,7 @@ const {
 
 const {
   createArtisanWithTransaction,
+  listActiveArtisans,
 } = require(
   '../repositories/artisan.repository'
 );
@@ -49,6 +50,61 @@ function formatValidationDetails(error) {
           detail.message || '',
       }))
     : [];
+}
+
+async function listSecureArtisans(
+  {
+    user,
+  } = {},
+  dependencies = {}
+) {
+  const adminUserId =
+    typeof user?.uid === 'string'
+      ? user.uid.trim()
+      : '';
+
+  if (!adminUserId) {
+    throw createArtisanServiceError(
+      ARTISAN_SERVICE_ERROR
+        .AUTHENTICATION_REQUIRED,
+      'Authenticated admin is required.'
+    );
+  }
+
+  const repositoryFunction =
+    Object.prototype.hasOwnProperty.call(
+      dependencies,
+      'listActiveArtisans'
+    )
+      ? dependencies.listActiveArtisans
+      : listActiveArtisans;
+
+  if (
+    typeof repositoryFunction !==
+    'function'
+  ) {
+    throw createArtisanServiceError(
+      ARTISAN_SERVICE_ERROR
+        .INVALID_REPOSITORY,
+      'Artisan list repository is unavailable.'
+    );
+  }
+
+  const result =
+    await repositoryFunction(
+      dependencies
+        .repositoryDependencies
+    );
+
+  if (!Array.isArray(result)) {
+    throw createArtisanServiceError(
+      ARTISAN_SERVICE_ERROR
+        .INVALID_REPOSITORY,
+      'Artisan list repository returned invalid data.'
+    );
+  }
+
+  return result;
 }
 
 async function createSecureArtisan(
@@ -120,4 +176,5 @@ module.exports = {
   ARTISAN_SERVICE_ERROR,
   formatValidationDetails,
   createSecureArtisan,
+  listSecureArtisans,
 };

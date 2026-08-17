@@ -2,6 +2,7 @@
 
 const {
   createSecureArtisan,
+  listSecureArtisans,
 } = require(
   '../services/artisan.service'
 );
@@ -133,6 +134,103 @@ function mapArtisanError(error) {
   }
 }
 
+function sanitizeArtisanListResponse(
+  artisans
+) {
+  if (!Array.isArray(artisans)) {
+    return Object.freeze([]);
+  }
+
+  return Object.freeze(
+    artisans.map((artisan) =>
+      sanitizeArtisanResponse(
+        artisan,
+        typeof artisan?.id === 'string'
+          ? artisan.id
+          : ''
+      )
+    )
+  );
+}
+
+function mapArtisanListError(error) {
+  if (
+    error?.code ===
+    'AUTHENTICATION_REQUIRED'
+  ) {
+    return {
+      status: 401,
+      code:
+        'AUTHENTICATION_REQUIRED',
+      message:
+        'Authentication is required.',
+    };
+  }
+
+  return {
+    status: 500,
+    code: 'INTERNAL_ERROR',
+    message:
+      'Unable to list artisans.',
+  };
+}
+
+function createListArtisansController(
+  {
+    listSecureArtisansFn =
+      listSecureArtisans,
+  } = {}
+) {
+  if (
+    typeof listSecureArtisansFn !==
+    'function'
+  ) {
+    throw new TypeError(
+      'listSecureArtisansFn must be a function.'
+    );
+  }
+
+  return async function listArtisansController(
+    req,
+    res
+  ) {
+    try {
+      const result =
+        await listSecureArtisansFn({
+          user: req?.user,
+        });
+
+      const data =
+        sanitizeArtisanListResponse(
+          result
+        );
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+          data,
+        });
+    } catch (error) {
+      const mapped =
+        mapArtisanListError(
+          error
+        );
+
+      return res
+        .status(mapped.status)
+        .json({
+          success: false,
+          code: mapped.code,
+          message: mapped.message,
+        });
+    }
+  };
+}
+
+const listArtisans =
+  createListArtisansController();
+
 function createArtisanController(
   {
     createSecureArtisanFn =
@@ -213,6 +311,10 @@ const createArtisan =
 module.exports = {
   mapArtisanError,
   sanitizeArtisanResponse,
+  sanitizeArtisanListResponse,
+  mapArtisanListError,
   createArtisanController,
   createArtisan,
+  createListArtisansController,
+  listArtisans,
 };

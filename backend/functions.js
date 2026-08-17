@@ -9,6 +9,7 @@ const app = require("./app");
 const API_OPTIONS = Object.freeze({
   region: "asia-south1",
   maxInstances: 2,
+  cors: false,
 });
 
 exports.api = onRequest(

@@ -29,12 +29,20 @@ function resolveArtisanRouteDependencies(
       '../controllers/artisan.controller'
     ).createArtisan;
 
+  const listArtisansHandler =
+    dependencies.listArtisansHandler ||
+    require(
+      '../controllers/artisan.controller'
+    ).listArtisans;
+
   if (
     typeof verifyAuthMiddleware !==
       'function' ||
     typeof requirePermissionFn !==
       'function' ||
     typeof createArtisanHandler !==
+      'function' ||
+    typeof listArtisansHandler !==
       'function'
   ) {
     throw new TypeError(
@@ -46,6 +54,7 @@ function resolveArtisanRouteDependencies(
     verifyAuthMiddleware,
     requirePermissionFn,
     createArtisanHandler,
+    listArtisansHandler,
   };
 }
 
@@ -56,6 +65,7 @@ function createArtisanRouter(
     verifyAuthMiddleware,
     requirePermissionFn,
     createArtisanHandler,
+    listArtisansHandler,
   } =
     resolveArtisanRouteDependencies(
       dependencies
@@ -66,22 +76,37 @@ function createArtisanRouter(
       PERMISSIONS.ARTISANS_CREATE
     );
 
+  const listPermissionMiddleware =
+    requirePermissionFn(
+      PERMISSIONS.ARTISANS_LIST
+    );
+
   if (
     typeof createPermissionMiddleware !==
-    'function'
+      'function' ||
+    typeof listPermissionMiddleware !==
+      'function'
   ) {
     throw new TypeError(
       'Artisan permission middleware must be a function.'
     );
   }
 
-  const router = express.Router();
+  const router =
+    express.Router();
 
   router.post(
     '/',
     verifyAuthMiddleware,
     createPermissionMiddleware,
     createArtisanHandler
+  );
+
+  router.get(
+    '/',
+    verifyAuthMiddleware,
+    listPermissionMiddleware,
+    listArtisansHandler
   );
 
   return router;
