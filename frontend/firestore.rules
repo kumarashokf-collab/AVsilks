@@ -35,6 +35,14 @@ service cloud.firestore {
         if false;
     }
 
+    match /publicProvenance/{publicId} {
+      allow get: if true;
+      allow list: if false;
+
+      allow create, update, delete:
+        if false;
+    }
+
     match /orders/{orderId} {
       allow read:
         if isAdmin() || isOrderOwner();

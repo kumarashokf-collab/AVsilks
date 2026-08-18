@@ -1,126 +1,85 @@
-'use strict';
-
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import test from "node:test";
+import assert from "node:assert/strict";
 
 import {
   PUBLIC_PROVENANCE_ERROR,
   fetchPublicProvenance,
-} from '../src/services/publicProvenance.js';
+} from "../src/services/publicProvenance.js";
 
-function createPublishedResponse() {
+function createPublishedDocument() {
   return {
-    success: true,
-    verified: true,
+    publicId:
+      "pub-001",
 
-    data: {
-      publicId:
-        'pub-001',
+    product: {
+      sku:
+        "SKU-001",
+      name:
+        "Handloom Silk Saree",
+    },
 
-      product: {
-        sku:
-          'SKU-001',
-        name:
-          'Handloom Silk Saree',
-      },
+    artisan: {
+      code:
+        "ART-0001",
+      name:
+        "Lakshmi Weaver",
+    },
 
-      artisan: {
-        code:
-          'ART-0001',
-        name:
-          'Lakshmi Weaver',
-      },
+    material:
+      "Pure Silk",
 
-      material:
-        'Pure Silk',
+    weaveTechnique:
+      "Handloom Ikat",
 
-      weaveTechnique:
-        'Handloom Ikat',
+    loomType:
+      "Pit Loom",
 
-      loomType:
-        'Pit Loom',
-
-      origin: {
-        village:
-          'Pochampally',
-        district:
-          'Yadadri Bhuvanagiri',
-        state:
-          'Telangana',
-        country:
-          'India',
-      },
+    origin: {
+      village:
+        "Pochampally",
+      district:
+        "Yadadri Bhuvanagiri",
+      state:
+        "Telangana",
+      country:
+        "India",
     },
   };
 }
 
 test(
-  'fetches public provenance without authentication headers',
+  "reads sanitized public provenance by exact public document ID",
   async () => {
-    let capturedUrl = null;
-    let capturedOptions = null;
+    let capturedPublicId = null;
 
     const result =
       await fetchPublicProvenance(
-        '  pub-001  ',
+        "  pub-001  ",
         {
-          getApiBaseUrlFn() {
-            return '/api/';
-          },
-
-          async fetchImpl(
-            url,
-            options
+          async readPublicDocument(
+            publicId
           ) {
-            capturedUrl = url;
-            capturedOptions = options;
+            capturedPublicId =
+              publicId;
 
-            return {
-              ok: true,
-              status: 200,
-
-              async json() {
-                return createPublishedResponse();
-              },
-            };
+            return createPublishedDocument();
           },
         }
       );
 
     assert.equal(
-      capturedUrl,
-      '/api/provenance/public/pub-001'
-    );
-
-    assert.equal(
-      capturedOptions.method,
-      'GET'
-    );
-
-    assert.deepEqual(
-      capturedOptions.headers,
-      {
-        Accept:
-          'application/json',
-      }
-    );
-
-    assert.equal(
-      Object.prototype.hasOwnProperty.call(
-        capturedOptions.headers,
-        'Authorization'
-      ),
-      false
+      capturedPublicId,
+      "pub-001"
     );
 
     assert.equal(
       result.publicId,
-      'pub-001'
+      "pub-001"
     );
 
     assert.equal(
       result.product.name,
-      'Handloom Silk Saree'
+      "Handloom Silk Saree"
     );
 
     assert.equal(
@@ -131,30 +90,23 @@ test(
 );
 
 test(
-  'rejects invalid public provenance ID before network access',
+  "rejects invalid public provenance ID before Firestore access",
   async () => {
-    let fetchCalled = false;
+    let readCalled = false;
 
     for (const publicId of [
-      '',
-      'bad/id',
-      'x'.repeat(129),
+      "",
+      "bad/id",
+      "x".repeat(129),
     ]) {
       await assert.rejects(
         () =>
           fetchPublicProvenance(
             publicId,
             {
-              getApiBaseUrlFn() {
-                return '/api';
-              },
-
-              async fetchImpl() {
-                fetchCalled = true;
-
-                throw new Error(
-                  'fetch should not run'
-                );
+              async readPublicDocument() {
+                readCalled = true;
+                return null;
               },
             }
           ),
@@ -166,40 +118,22 @@ test(
     }
 
     assert.equal(
-      fetchCalled,
+      readCalled,
       false
     );
   }
 );
 
 test(
-  'maps unavailable public provenance to one generic not found error',
+  "maps unavailable public provenance to generic not found",
   async () => {
     await assert.rejects(
       () =>
         fetchPublicProvenance(
-          'pub-001',
+          "pub-001",
           {
-            getApiBaseUrlFn() {
-              return '/api';
-            },
-
-            async fetchImpl() {
-              return {
-                ok: false,
-                status: 404,
-
-                async json() {
-                  return {
-                    success: false,
-                    verified: false,
-                    code:
-                      'PUBLIC_PROVENANCE_NOT_FOUND',
-                    message:
-                      'internal state must not control frontend message',
-                  };
-                },
-              };
+            async readPublicDocument() {
+              return null;
             },
           }
         ),
@@ -208,57 +142,41 @@ test(
           PUBLIC_PROVENANCE_ERROR
             .NOT_FOUND &&
         error.message ===
-          'Provenance verification was not found.'
+          "Provenance verification was not found."
     );
   }
 );
 
 test(
-  'rejects malformed or inconsistent successful verification responses',
+  "rejects malformed or mismatched public provenance documents",
   async () => {
-    for (const body of [
+    const invalidDocuments = [
+      null,
       {
-        success: true,
-        verified: false,
-        data: {
-          publicId:
-            'pub-001',
-        },
+        publicId:
+          "different-public-id",
       },
+      {
+        ...createPublishedDocument(),
+        artisan: null,
+      },
+      {
+        ...createPublishedDocument(),
+        material: 123,
+      },
+    ];
 
-      {
-        success: true,
-        verified: true,
-        data: {
-          publicId:
-            'different-public-id',
-        },
-      },
-
-      {
-        success: true,
-        verified: true,
-        data: null,
-      },
-    ]) {
+    for (
+      const documentData of
+      invalidDocuments.slice(1)
+    ) {
       await assert.rejects(
         () =>
           fetchPublicProvenance(
-            'pub-001',
+            "pub-001",
             {
-              getApiBaseUrlFn() {
-                return '/api';
-              },
-
-              async fetchImpl() {
-                return {
-                  ok: true,
-                  status: 200,
-
-                  async json() {
-                    return body;
-                  },
-                };
+              async readPublicDocument() {
+                return documentData;
               },
             }
           ),
@@ -272,37 +190,40 @@ test(
 );
 
 test(
-  'rejects invalid frontend public provenance dependencies',
+  "maps Firestore read failures to generic request failed",
   async () => {
     await assert.rejects(
       () =>
         fetchPublicProvenance(
-          'pub-001',
+          "pub-001",
           {
-            fetchImpl:
-              'not-a-function',
-
-            getApiBaseUrlFn() {
-              return '/api';
+            async readPublicDocument() {
+              throw new Error(
+                "internal firestore error"
+              );
             },
           }
         ),
-      TypeError
+      (error) =>
+        error.code ===
+          PUBLIC_PROVENANCE_ERROR
+            .REQUEST_FAILED &&
+        error.message ===
+          "Provenance verification request failed."
     );
+  }
+);
 
+test(
+  "rejects invalid public provenance reader dependency",
+  async () => {
     await assert.rejects(
       () =>
         fetchPublicProvenance(
-          'pub-001',
+          "pub-001",
           {
-            async fetchImpl() {
-              throw new Error(
-                'should not run'
-              );
-            },
-
-            getApiBaseUrlFn:
-              'not-a-function',
+            readPublicDocument:
+              "not-a-function",
           }
         ),
       TypeError

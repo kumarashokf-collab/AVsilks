@@ -597,6 +597,97 @@ function isAllowedStatusTransition(
   );
 }
 
+function buildPublicProvenanceProjection(
+  provenanceData
+) {
+  const source =
+    isPlainObject(provenanceData)
+      ? provenanceData
+      : {};
+
+  const publicId =
+    normalizeText(
+      source.publicId
+    );
+
+  if (
+    !publicId ||
+    publicId.includes('/')
+  ) {
+    throw createRepositoryError(
+      PROVENANCE_REPOSITORY_ERROR
+        .INVALID_PROVENANCE_DATA,
+      'Stored provenance public ID is invalid.'
+    );
+  }
+
+  const origin =
+    isPlainObject(source.origin)
+      ? source.origin
+      : {};
+
+  return {
+    publicId,
+
+    product: {
+      sku:
+        normalizeText(
+          source.skuSnapshot
+        ),
+      name:
+        normalizeText(
+          source.productNameSnapshot
+        ),
+    },
+
+    artisan: {
+      code:
+        normalizeText(
+          source.artisanCodeSnapshot
+        ),
+      name:
+        normalizeText(
+          source.artisanNameSnapshot
+        ),
+    },
+
+    material:
+      normalizeText(
+        source.material
+      ),
+
+    weaveTechnique:
+      normalizeText(
+        source.weaveTechnique
+      ),
+
+    loomType:
+      normalizeText(
+        source.loomType
+      ),
+
+    origin: {
+      village:
+        normalizeText(
+          origin.village
+        ),
+      district:
+        normalizeText(
+          origin.district
+        ),
+      state:
+        normalizeText(
+          origin.state
+        ),
+      country:
+        normalizeText(
+          origin.country
+        ),
+    },
+  };
+}
+
+
 async function transitionProvenanceStatusWithTransaction(
   {
     adminUserId,
@@ -664,6 +755,18 @@ async function transitionProvenanceStatusWithTransaction(
         );
       }
 
+      const publicProjection =
+        buildPublicProvenanceProjection(
+          provenanceData
+        );
+
+      const publicProjectionRef =
+        db.collection(
+          'publicProvenance'
+        ).doc(
+          publicProjection.publicId
+        );
+
       const timestamp =
         serverTimestamp();
 
@@ -684,6 +787,11 @@ async function transitionProvenanceStatusWithTransaction(
       ) {
         updateData.publishedAt =
           timestamp;
+
+        transaction.set(
+          publicProjectionRef,
+          publicProjection
+        );
       }
 
       if (
@@ -692,6 +800,10 @@ async function transitionProvenanceStatusWithTransaction(
       ) {
         updateData.archivedAt =
           timestamp;
+
+        transaction.delete(
+          publicProjectionRef
+        );
       }
 
       transaction.update(

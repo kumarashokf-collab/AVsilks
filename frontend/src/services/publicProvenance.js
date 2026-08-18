@@ -1,7 +1,3 @@
-import {
-  getApiBaseUrl,
-} from "./api.js";
-
 export const PUBLIC_PROVENANCE_ERROR =
   Object.freeze({
     INVALID_PUBLIC_ID:
@@ -52,9 +48,7 @@ function normalizePublicId(
   return normalized;
 }
 
-function isString(
-  value
-) {
+function isString(value) {
   return typeof value === "string";
 }
 
@@ -66,8 +60,7 @@ function sanitizeVerifiedData(
     !data ||
     typeof data !== "object" ||
     Array.isArray(data) ||
-    data.publicId !==
-      expectedPublicId ||
+    data.publicId !== expectedPublicId ||
     !data.product ||
     typeof data.product !== "object" ||
     Array.isArray(data.product) ||
@@ -101,8 +94,7 @@ function sanitizeVerifiedData(
 
   if (
     requiredStrings.some(
-      (value) =>
-        !isString(value)
+      (value) => !isString(value)
     )
   ) {
     throw createPublicProvenanceError(
@@ -112,45 +104,25 @@ function sanitizeVerifiedData(
     );
   }
 
-  const product =
-    Object.freeze({
-      sku:
-        data.product.sku,
-
-      name:
-        data.product.name,
-    });
-
-  const artisan =
-    Object.freeze({
-      code:
-        data.artisan.code,
-
-      name:
-        data.artisan.name,
-    });
-
-  const origin =
-    Object.freeze({
-      village:
-        data.origin.village,
-
-      district:
-        data.origin.district,
-
-      state:
-        data.origin.state,
-
-      country:
-        data.origin.country,
-    });
-
   return Object.freeze({
     publicId:
       expectedPublicId,
 
-    product,
-    artisan,
+    product:
+      Object.freeze({
+        sku:
+          data.product.sku,
+        name:
+          data.product.name,
+      }),
+
+    artisan:
+      Object.freeze({
+        code:
+          data.artisan.code,
+        name:
+          data.artisan.name,
+      }),
 
     material:
       data.material,
@@ -161,8 +133,49 @@ function sanitizeVerifiedData(
     loomType:
       data.loomType,
 
-    origin,
+    origin:
+      Object.freeze({
+        village:
+          data.origin.village,
+        district:
+          data.origin.district,
+        state:
+          data.origin.state,
+        country:
+          data.origin.country,
+      }),
   });
+}
+
+async function defaultReadPublicDocument(
+  publicId
+) {
+  const [
+    firestoreModule,
+    firebaseModule,
+  ] =
+    await Promise.all([
+      import("firebase/firestore"),
+      import("../firebase.js"),
+    ]);
+
+  const ref =
+    firestoreModule.doc(
+      firebaseModule.db,
+      "publicProvenance",
+      publicId
+    );
+
+  const snapshot =
+    await firestoreModule.getDoc(
+      ref
+    );
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  return snapshot.data();
 }
 
 export async function fetchPublicProvenance(
@@ -174,66 +187,29 @@ export async function fetchPublicProvenance(
       publicId
     );
 
-  const fetchImpl =
+  const readPublicDocument =
     Object.prototype.hasOwnProperty.call(
       dependencies,
-      "fetchImpl"
+      "readPublicDocument"
     )
-      ? dependencies.fetchImpl
-      : globalThis.fetch;
-
-  const getApiBaseUrlFn =
-    Object.prototype.hasOwnProperty.call(
-      dependencies,
-      "getApiBaseUrlFn"
-    )
-      ? dependencies.getApiBaseUrlFn
-      : getApiBaseUrl;
+      ? dependencies.readPublicDocument
+      : defaultReadPublicDocument;
 
   if (
-    typeof fetchImpl !==
+    typeof readPublicDocument !==
       "function"
   ) {
     throw new TypeError(
-      "Public provenance fetch dependency must be a function."
+      "Public provenance document reader must be a function."
     );
   }
 
-  if (
-    typeof getApiBaseUrlFn !==
-      "function"
-  ) {
-    throw new TypeError(
-      "Public provenance API base URL dependency must be a function."
-    );
-  }
-
-  const apiBaseUrl =
-    String(
-      getApiBaseUrlFn()
-    )
-      .trim()
-      .replace(
-        /\/+$/,
-        ""
-      );
-
-  let response;
+  let data;
 
   try {
-    response =
-      await fetchImpl(
-        `${apiBaseUrl}/provenance/public/${encodeURIComponent(
-          normalizedPublicId
-        )}`,
-        {
-          method: "GET",
-
-          headers: {
-            Accept:
-              "application/json",
-          },
-        }
+    data =
+      await readPublicDocument(
+        normalizedPublicId
       );
   } catch {
     throw createPublicProvenanceError(
@@ -243,18 +219,7 @@ export async function fetchPublicProvenance(
     );
   }
 
-  let body = null;
-
-  try {
-    body =
-      await response.json();
-  } catch {
-    body = null;
-  }
-
-  if (
-    response.status === 404
-  ) {
+  if (data == null) {
     throw createPublicProvenanceError(
       PUBLIC_PROVENANCE_ERROR
         .NOT_FOUND,
@@ -262,29 +227,8 @@ export async function fetchPublicProvenance(
     );
   }
 
-  if (
-    !response.ok
-  ) {
-    throw createPublicProvenanceError(
-      PUBLIC_PROVENANCE_ERROR
-        .REQUEST_FAILED,
-      "Provenance verification request failed."
-    );
-  }
-
-  if (
-    body?.success !== true ||
-    body?.verified !== true
-  ) {
-    throw createPublicProvenanceError(
-      PUBLIC_PROVENANCE_ERROR
-        .INVALID_RESPONSE,
-      "Public provenance response is invalid."
-    );
-  }
-
   return sanitizeVerifiedData(
-    body.data,
+    data,
     normalizedPublicId
   );
 }

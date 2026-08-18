@@ -23,6 +23,7 @@ function createHarness({
 } = {}) {
   const reads = [];
   const operations = [];
+  const projectionOperations = [];
 
   const db = {
     collection(name) {
@@ -56,6 +57,30 @@ function createHarness({
                     'product-001',
                   artisanId:
                     'artisan-001',
+                  skuSnapshot:
+                    'E2E-HANDLOOM-001',
+                  productNameSnapshot:
+                    'Local Handloom Demo Saree',
+                  artisanCodeSnapshot:
+                    'ART-E2E-001',
+                  artisanNameSnapshot:
+                    'Lakshmi Weaver',
+                  material:
+                    'Pure Silk',
+                  weaveTechnique:
+                    'Traditional Handloom Weave',
+                  loomType:
+                    'Pit Loom',
+                  origin: {
+                    village:
+                      'Somandepalli',
+                    district:
+                      'Sri Sathya Sai',
+                    state:
+                      'Andhra Pradesh',
+                    country:
+                      'India',
+                  },
                   status:
                     provenanceStatus,
                 };
@@ -75,6 +100,21 @@ function createHarness({
             data,
           });
         },
+
+        set(ref, data) {
+          projectionOperations.push({
+            type: 'set',
+            path: ref.path,
+            data,
+          });
+        },
+
+        delete(ref) {
+          projectionOperations.push({
+            type: 'delete',
+            path: ref.path,
+          });
+        },
       };
 
       return callback(transaction);
@@ -84,6 +124,7 @@ function createHarness({
   return {
     reads,
     operations,
+    projectionOperations,
 
     dependencies: {
       db,
@@ -378,6 +419,107 @@ test(
     assert.equal(
       transactionStarted,
       false
+    );
+  }
+);
+
+
+test(
+  'creates a sanitized public projection when provenance is published',
+  async () => {
+    const harness =
+      createHarness({
+        provenanceStatus:
+          PROVENANCE_STATUS.DRAFT,
+      });
+
+    await transitionProvenanceStatusWithTransaction(
+      {
+        adminUserId:
+          'admin-uid-1',
+        provenanceId:
+          'prov-001',
+        nextStatus:
+          PROVENANCE_STATUS.PUBLISHED,
+      },
+      harness.dependencies
+    );
+
+    assert.deepEqual(
+      harness.projectionOperations,
+      [
+        {
+          type: 'set',
+          path:
+            'publicProvenance/pub-001',
+          data: {
+            publicId:
+              'pub-001',
+            product: {
+              sku:
+                'E2E-HANDLOOM-001',
+              name:
+                'Local Handloom Demo Saree',
+            },
+            artisan: {
+              code:
+                'ART-E2E-001',
+              name:
+                'Lakshmi Weaver',
+            },
+            material:
+              'Pure Silk',
+            weaveTechnique:
+              'Traditional Handloom Weave',
+            loomType:
+              'Pit Loom',
+            origin: {
+              village:
+                'Somandepalli',
+              district:
+                'Sri Sathya Sai',
+              state:
+                'Andhra Pradesh',
+              country:
+                'India',
+            },
+          },
+        },
+      ]
+    );
+  }
+);
+
+test(
+  'removes the public projection when provenance is archived',
+  async () => {
+    const harness =
+      createHarness({
+        provenanceStatus:
+          PROVENANCE_STATUS.PUBLISHED,
+      });
+
+    await transitionProvenanceStatusWithTransaction(
+      {
+        adminUserId:
+          'admin-uid-1',
+        provenanceId:
+          'prov-001',
+        nextStatus:
+          PROVENANCE_STATUS.ARCHIVED,
+      },
+      harness.dependencies
+    );
+
+    assert.deepEqual(
+      harness.projectionOperations,
+      [
+        {
+          type: 'delete',
+          path:
+            'publicProvenance/pub-001',
+        },
+      ]
     );
   }
 );
