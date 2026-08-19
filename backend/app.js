@@ -3,6 +3,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
+const { getRateLimitKey } = require("./src/security/rateLimitKey");
 const productRoutes = require("./src/routes/product.routes");
 const {
   createOrderRouter,
@@ -48,6 +49,7 @@ const apiRateLimiter = rateLimit({
   limit: 300,
   standardHeaders: "draft-8",
   legacyHeaders: false,
+  keyGenerator: getRateLimitKey,
   handler: (req, res) => {
     res.status(429).json({
       success: false,
