@@ -10,6 +10,7 @@ import { useProducts } from "../context/ProductContext";
 import { useOrders } from "../context/OrderContext";
 import { BRAND } from "../config/branding";
 import ProvenanceSetupPanel from "../components/ProvenanceSetupPanel.jsx";
+import SparkPublicQrStudio from "../components/SparkPublicQrStudio.jsx";
 import {
   fetchManagedProvenance,
 } from "../services/provenanceManagement.js";
@@ -2210,10 +2211,19 @@ function Admin({ user }) {
       )}
 
       {activeTab === "provenance" && (
-        <ProvenanceSetupPanel
-          user={user}
-          products={products}
-        />
+        <div
+          style={{
+            display: "grid",
+            gap: "var(--space-6)"
+          }}
+        >
+          <SparkPublicQrStudio />
+
+          <ProvenanceSetupPanel
+            user={user}
+            products={products}
+          />
+        </div>
       )}
     </main>
   );

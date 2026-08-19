@@ -61,7 +61,12 @@ test(
 
     assert.match(
       apiSource,
-      /import\.meta\.env\.PROD\s*\?\s*["']\/api["']/
+      /const\s+environment\s*=\s*import\.meta\.env\s*\?\?\s*\{\s*\}\s*;/
+    );
+
+    assert.match(
+      apiSource,
+      /environment\.PROD\s*===\s*true\s*\?\s*["']\/api["']/
     );
   }
 );
