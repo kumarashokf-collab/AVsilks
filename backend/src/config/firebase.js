@@ -1,27 +1,57 @@
-const admin = require("firebase-admin");
+"use strict";
+
+const {
+  applicationDefault,
+  cert,
+  getApps,
+  initializeApp,
+} = require("firebase-admin/app");
+
+const {
+  getAuth,
+} = require("firebase-admin/auth");
+
+const {
+  getFirestore,
+} = require("firebase-admin/firestore");
+
 const {
   buildFirebaseOptions,
 } = require("./firebaseOptions");
 
 function initializeFirebase() {
-  if (admin.apps.length > 0) {
-    return admin.app();
+  const defaultApp =
+    getApps().find(
+      (app) =>
+        app.name === "[DEFAULT]"
+    );
+
+  if (defaultApp) {
+    return defaultApp;
   }
 
-  return admin.initializeApp(
+  return initializeApp(
     buildFirebaseOptions({
       env: process.env,
-      credential: admin.credential,
+      credential: {
+        cert,
+        applicationDefault,
+      },
     })
   );
 }
 
-initializeFirebase();
+const firebaseApp =
+  initializeFirebase();
 
-const db = admin.firestore();
+const auth =
+  getAuth(firebaseApp);
+
+const db =
+  getFirestore(firebaseApp);
 
 module.exports = {
-  admin,
+  auth,
   db,
   initializeFirebase,
 };

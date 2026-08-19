@@ -1,6 +1,6 @@
 'use strict';
 
-const { admin, db } = require('../config/firebase');
+const { auth, db } = require('../config/firebase');
 const {
   DEFAULT_ROLE,
   normalizeRole,
@@ -89,13 +89,16 @@ async function verifyAuth(req, res, next) {
       });
     }
 
-    const decodedToken = await admin
-      .auth()
-      .verifyIdToken(idToken, true);
+    const decodedToken =
+      await auth.verifyIdToken(
+        idToken,
+        true
+      );
 
-    const userRecord = await admin
-      .auth()
-      .getUser(decodedToken.uid);
+    const userRecord =
+      await auth.getUser(
+        decodedToken.uid
+      );
 
     if (userRecord.disabled) {
       return res.status(403).json({
