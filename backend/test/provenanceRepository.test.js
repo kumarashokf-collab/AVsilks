@@ -462,3 +462,165 @@ test(
     );
   }
 );
+
+
+test(
+  'uses modular FieldValue when the default Firebase admin namespace lacks legacy FieldValue',
+  async () => {
+    const operations = [];
+    let transactionCount = 0;
+
+    const db = {
+      collection(collectionName) {
+        return {
+          doc(documentId) {
+            return {
+              id: documentId,
+              path:
+                collectionName +
+                '/' +
+                documentId,
+            };
+          },
+        };
+      },
+
+      async runTransaction(callback) {
+        transactionCount += 1;
+
+        const transaction = {
+          async get(ref) {
+            if (
+              ref.path ===
+              'products/product-001'
+            ) {
+              return {
+                exists: true,
+                data: () => ({
+                  name:
+                    'Handloom Silk Saree',
+                  sku: 'AV-001',
+                  active: true,
+                }),
+              };
+            }
+
+            if (
+              ref.path ===
+              'artisans/artisan-001'
+            ) {
+              return {
+                exists: true,
+                data: () => ({
+                  artisanCode:
+                    'ART-0001',
+                  displayName:
+                    'Lakshmi Weaver',
+                  active: true,
+                }),
+              };
+            }
+
+            if (
+              ref.path.startsWith(
+                'provenancePublicIds/'
+              )
+            ) {
+              return {
+                exists: false,
+                data: () => undefined,
+              };
+            }
+
+            throw new Error(
+              'Unexpected transaction read: ' +
+              ref.path
+            );
+          },
+
+          set(ref, data) {
+            operations.push({
+              type: 'set',
+              path: ref.path,
+              data,
+            });
+          },
+
+          update(ref, data) {
+            operations.push({
+              type: 'update',
+              path: ref.path,
+              data,
+            });
+          },
+        };
+
+        return callback(transaction);
+      },
+    };
+
+    const configPath =
+      require.resolve(
+        '../src/config/firebase'
+      );
+
+    const previousConfigModule =
+      require.cache[configPath];
+
+    require.cache[configPath] = {
+      id: configPath,
+      filename: configPath,
+      loaded: true,
+      exports: {
+        db,
+
+        admin: {
+          firestore() {
+            return db;
+          },
+        },
+      },
+    };
+
+    try {
+      const result =
+        await createProvenanceWithTransaction(
+          createInput()
+        );
+
+      assert.equal(
+        result.created,
+        true
+      );
+
+      assert.equal(
+        transactionCount,
+        1
+      );
+
+      assert.equal(
+        operations.length,
+        3
+      );
+
+      assert.match(
+        result.provenanceId,
+        /^prov_[a-f0-9]+$/
+      );
+
+      assert.match(
+        result.publicId,
+        /^pub_[a-f0-9]+$/
+      );
+    } finally {
+      if (previousConfigModule) {
+        require.cache[configPath] =
+          previousConfigModule;
+      } else {
+        delete require.cache[
+          configPath
+        ];
+      }
+    }
+  }
+);

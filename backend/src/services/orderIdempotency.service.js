@@ -152,9 +152,55 @@ function createOrderIdempotencyIdentity({
   });
 }
 
+
+function createPaymentIdempotencyIdentity({
+  userId,
+  idempotencyKey,
+  customer,
+  items,
+  paymentMethod,
+}) {
+  const normalizedUserId =
+    normalizeText(userId);
+
+  if (!normalizedUserId) {
+    const error = new Error(
+      'Authenticated user ID is required.'
+    );
+
+    error.code = 'INVALID_USER_ID';
+    throw error;
+  }
+
+  const normalizedKey =
+    validateIdempotencyKey(idempotencyKey);
+
+  const canonicalRequest =
+    buildCanonicalRequest({
+      userId: normalizedUserId,
+      customer,
+      items,
+      paymentMethod,
+    });
+
+  return Object.freeze({
+    paymentSessionId:
+      `paysess_${sha256(
+        `payment-session\n${normalizedUserId}\n${normalizedKey}`
+      ).slice(0, 48)}`,
+    idempotencyKeyHash:
+      sha256(normalizedKey),
+    requestFingerprint:
+      sha256(
+        JSON.stringify(canonicalRequest)
+      ),
+  });
+}
+
 module.exports = {
   sha256,
   validateIdempotencyKey,
   buildCanonicalRequest,
   createOrderIdempotencyIdentity,
+  createPaymentIdempotencyIdentity,
 };

@@ -18,7 +18,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useCart } from "../context/CartContext";
 import { BRAND } from "../config/branding";
-import { ROLES } from "../constants/roles";
+import { isAdministrativeRole } from "../constants/roles";
 import "./Navbar.css";
 
 function Navbar({ user, trustedSession }) {
@@ -31,7 +31,7 @@ function Navbar({ user, trustedSession }) {
     0
   );
 
-  const isAdmin = trustedSession?.role === ROLES.ADMIN;
+  const isAdmin = isAdministrativeRole(trustedSession?.role);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";

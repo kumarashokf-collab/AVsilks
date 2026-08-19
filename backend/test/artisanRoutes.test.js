@@ -24,7 +24,15 @@ function verifyAuth(
   next();
 }
 
-function permissionMiddleware(
+function createPermissionMiddleware(
+  req,
+  res,
+  next
+) {
+  next();
+}
+
+function listPermissionMiddleware(
   req,
   res,
   next
@@ -39,8 +47,15 @@ function createArtisan(
   res.end();
 }
 
+function listArtisans(
+  req,
+  res
+) {
+  res.end();
+}
+
 function buildRouter() {
-  let capturedPermission = null;
+  const capturedPermissions = [];
 
   const router =
     createArtisanRouter({
@@ -50,19 +65,40 @@ function buildRouter() {
       requirePermissionFn(
         permission
       ) {
-        capturedPermission =
-          permission;
+        capturedPermissions.push(
+          permission
+        );
 
-        return permissionMiddleware;
+        if (
+          permission ===
+          PERMISSIONS.ARTISANS_CREATE
+        ) {
+          return createPermissionMiddleware;
+        }
+
+        if (
+          permission ===
+          PERMISSIONS.ARTISANS_LIST
+        ) {
+          return listPermissionMiddleware;
+        }
+
+        throw new Error(
+          'Unexpected artisan permission: ' +
+            permission
+        );
       },
 
       createArtisanHandler:
         createArtisan,
+
+      listArtisansHandler:
+        listArtisans,
     });
 
   return {
     router,
-    capturedPermission,
+    capturedPermissions,
   };
 }
 
@@ -71,12 +107,14 @@ test(
   () => {
     const {
       router,
-      capturedPermission,
+      capturedPermissions,
     } = buildRouter();
 
     assert.equal(
-      capturedPermission,
-      PERMISSIONS.ARTISANS_CREATE
+      capturedPermissions.includes(
+        PERMISSIONS.ARTISANS_CREATE
+      ),
+      true
     );
 
     const routeLayer =
@@ -91,7 +129,7 @@ test(
 );
 
 test(
-  'runs authentication permission and controller in order',
+  'runs POST authentication create permission and controller in order',
   () => {
     const {
       router,
@@ -118,12 +156,99 @@ test(
 
     assert.equal(
       routeLayer.route.stack[1].handle,
-      permissionMiddleware
+      createPermissionMiddleware
     );
 
     assert.equal(
       routeLayer.route.stack[2].handle,
       createArtisan
+    );
+  }
+);
+
+test(
+  'protects GET / with artisans.list permission',
+  () => {
+    const {
+      router,
+      capturedPermissions,
+    } = buildRouter();
+
+    assert.equal(
+      capturedPermissions.includes(
+        PERMISSIONS.ARTISANS_LIST
+      ),
+      true
+    );
+
+    const routeLayer =
+      router.stack.find(
+        (layer) =>
+          layer.route?.path === '/' &&
+          layer.route?.methods?.get === true
+      );
+
+    assert.ok(routeLayer);
+  }
+);
+
+test(
+  'runs GET authentication list permission and controller in order',
+  () => {
+    const {
+      router,
+    } = buildRouter();
+
+    const routeLayer =
+      router.stack.find(
+        (layer) =>
+          layer.route?.path === '/' &&
+          layer.route?.methods?.get === true
+      );
+
+    assert.ok(routeLayer);
+
+    assert.equal(
+      routeLayer.route.stack.length,
+      3
+    );
+
+    assert.equal(
+      routeLayer.route.stack[0].handle,
+      verifyAuth
+    );
+
+    assert.equal(
+      routeLayer.route.stack[1].handle,
+      listPermissionMiddleware
+    );
+
+    assert.equal(
+      routeLayer.route.stack[2].handle,
+      listArtisans
+    );
+  }
+);
+
+test(
+  'registers dedicated create and list artisan permissions',
+  () => {
+    const {
+      capturedPermissions,
+    } = buildRouter();
+
+    assert.equal(
+      capturedPermissions.includes(
+        PERMISSIONS.ARTISANS_CREATE
+      ),
+      true
+    );
+
+    assert.equal(
+      capturedPermissions.includes(
+        PERMISSIONS.ARTISANS_LIST
+      ),
+      true
     );
   }
 );
@@ -139,10 +264,13 @@ test(
 
           requirePermissionFn:
             () =>
-              permissionMiddleware,
+              createPermissionMiddleware,
 
           createArtisanHandler:
             createArtisan,
+
+          listArtisansHandler:
+            listArtisans,
         }),
       TypeError
     );
@@ -158,6 +286,9 @@ test(
 
           createArtisanHandler:
             createArtisan,
+
+          listArtisansHandler:
+            listArtisans,
         }),
       TypeError
     );
@@ -170,9 +301,31 @@ test(
 
           requirePermissionFn:
             () =>
-              permissionMiddleware,
+              createPermissionMiddleware,
 
           createArtisanHandler:
+            'not-a-function',
+
+          listArtisansHandler:
+            listArtisans,
+        }),
+      TypeError
+    );
+
+    assert.throws(
+      () =>
+        resolveArtisanRouteDependencies({
+          verifyAuthMiddleware:
+            verifyAuth,
+
+          requirePermissionFn:
+            () =>
+              createPermissionMiddleware,
+
+          createArtisanHandler:
+            createArtisan,
+
+          listArtisansHandler:
             'not-a-function',
         }),
       TypeError
@@ -181,7 +334,7 @@ test(
 );
 
 test(
-  'rejects an invalid artisans.create permission middleware',
+  'rejects invalid artisan permission middleware',
   () => {
     assert.throws(
       () =>
@@ -189,12 +342,52 @@ test(
           verifyAuthMiddleware:
             verifyAuth,
 
-          requirePermissionFn:
-            () =>
-              'not-a-function',
+          requirePermissionFn(
+            permission
+          ) {
+            if (
+              permission ===
+              PERMISSIONS.ARTISANS_CREATE
+            ) {
+              return 'not-a-function';
+            }
+
+            return listPermissionMiddleware;
+          },
 
           createArtisanHandler:
             createArtisan,
+
+          listArtisansHandler:
+            listArtisans,
+        }),
+      TypeError
+    );
+
+    assert.throws(
+      () =>
+        createArtisanRouter({
+          verifyAuthMiddleware:
+            verifyAuth,
+
+          requirePermissionFn(
+            permission
+          ) {
+            if (
+              permission ===
+              PERMISSIONS.ARTISANS_LIST
+            ) {
+              return 'not-a-function';
+            }
+
+            return createPermissionMiddleware;
+          },
+
+          createArtisanHandler:
+            createArtisan,
+
+          listArtisansHandler:
+            listArtisans,
         }),
       TypeError
     );

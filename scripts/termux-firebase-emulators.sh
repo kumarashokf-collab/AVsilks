@@ -57,6 +57,26 @@ FIREBASE_JS="$(
 
 CONFIG_FILE="$ROOT/firebase.json"
 
+IMPORT_DIR="${AVSILKS_EMULATOR_IMPORT_DIR:-}"
+IMPORT_ARGS=()
+
+if [ -n "$IMPORT_DIR" ]; then
+  [ -d "$IMPORT_DIR" ] ||
+    fail "emulator import directory does not exist"
+
+  IMPORT_DIR="$(
+    readlink -f "$IMPORT_DIR"
+  )"
+
+  [ -f "$IMPORT_DIR/firebase-export-metadata.json" ] ||
+    fail "emulator import metadata is missing"
+
+  IMPORT_ARGS=(
+    --import
+    "$IMPORT_DIR"
+  )
+fi
+
 SDK_TARGET="$ROOT/backend/node_modules/firebase-functions/lib/bin/firebase-functions.js"
 
 LOCAL_SERVER_ENV="$ROOT/backend/.env.server.local"
@@ -98,6 +118,13 @@ printf 'SDK_ORIGINAL_SHEBANG=%s\n' "$FIRST_LINE"
 printf 'BILLING_ENABLED=False\n'
 printf 'CLOUD_DEPLOYMENT_PERFORMED=False\n'
 printf 'PRODUCTION_RULES_DEPLOYED=False\n'
+
+if [ "${#IMPORT_ARGS[@]}" -gt 0 ]; then
+  printf 'EMULATOR_IMPORT_ENABLED=True\n'
+  printf 'EMULATOR_IMPORT_DIR=%s\n' "$IMPORT_DIR"
+else
+  printf 'EMULATOR_IMPORT_ENABLED=False\n'
+fi
 
 if [ "$MODE" = "check" ]; then
   exit 0
@@ -254,6 +281,7 @@ printf 'STARTING_LOCAL_DEMO_EMULATORS=True\n'
   --project "$PROJECT_ID" \
   --config "$CONFIG_FILE" \
   --non-interactive \
+  "${IMPORT_ARGS[@]}" \
   > >(tee "$LOG_FILE") \
   2>&1 &
 

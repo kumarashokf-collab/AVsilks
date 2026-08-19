@@ -40,7 +40,7 @@ function createProvenance(
 }
 
 function buildRouter() {
-  let capturedPermission = null;
+  const capturedPermissions = [];
 
   const router =
     createProvenanceRouter({
@@ -50,10 +50,23 @@ function buildRouter() {
       requirePermissionFn(
         permission
       ) {
-        capturedPermission =
+        capturedPermissions.push(
+          permission
+        );
+
+        const middleware =
+          function capturedPermissionMiddleware(
+            req,
+            res,
+            next
+          ) {
+            next();
+          };
+
+        middleware.permission =
           permission;
 
-        return permissionMiddleware;
+        return middleware;
       },
 
       createProvenanceHandler:
@@ -62,7 +75,7 @@ function buildRouter() {
 
   return {
     router,
-    capturedPermission,
+    capturedPermissions,
   };
 }
 
@@ -71,12 +84,14 @@ test(
   () => {
     const {
       router,
-      capturedPermission,
+      capturedPermissions,
     } = buildRouter();
 
     assert.equal(
-      capturedPermission,
-      PERMISSIONS.PROVENANCE_CREATE
+      capturedPermissions.includes(
+        PERMISSIONS.PROVENANCE_CREATE
+      ),
+      true
     );
 
     const routeLayer =
@@ -117,8 +132,8 @@ test(
     );
 
     assert.equal(
-      routeLayer.route.stack[1].handle,
-      permissionMiddleware
+      routeLayer.route.stack[1].handle.permission,
+      PERMISSIONS.PROVENANCE_CREATE
     );
 
     assert.equal(

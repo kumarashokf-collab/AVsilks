@@ -7,17 +7,18 @@ import {
 } from "react";
 
 import {
-  addDoc,
   collection,
-  deleteDoc,
-  doc,
   onSnapshot,
   orderBy,
-  query,
-  serverTimestamp
+  query
 } from "firebase/firestore";
 
 import { db } from "../firebase";
+
+import {
+  createProduct,
+  deactivateProduct
+} from "../services/product.js";
 
 const ProductContext = createContext(null);
 
@@ -136,47 +137,27 @@ export function ProductProvider({ children }) {
     };
   }, []);
 
-  async function addProduct(product) {
+  async function addProduct(
+    product,
+    user
+  ) {
     try {
-      const normalized = normalizeProduct(product);
+      const normalized =
+        normalizeProduct(product);
 
-      if (!normalized.name) {
-        throw new Error(
-          "Product name is required."
+      const result =
+        await createProduct(
+          normalized,
+          user
         );
-      }
-
-      if (
-        !Number.isFinite(normalized.price) ||
-        normalized.price <= 0
-      ) {
-        throw new Error(
-          "Valid product price is required."
-        );
-      }
-
-      if (!normalized.sku) {
-        throw new Error(
-          "SKU is required."
-        );
-      }
-
-      const docRef = await addDoc(
-        collection(db, "products"),
-        {
-          ...normalized,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        }
-      );
 
       return {
         success: true,
-        id: docRef.id
+        id: result.id
       };
     } catch (addError) {
       console.error(
-        "Firestore product add failed:",
+        "Product API add failed:",
         addError
       );
 
@@ -192,29 +173,36 @@ export function ProductProvider({ children }) {
     }
   }
 
-  async function removeProduct(productId) {
+  async function removeProduct(
+    productId,
+    user
+  ) {
     try {
-      await deleteDoc(
-        doc(db, "products", productId)
-      );
+      const result =
+        await deactivateProduct(
+          productId,
+          user
+        );
 
       return {
-        success: true
+        success: true,
+        id: result.id,
+        active: false
       };
-    } catch (deleteError) {
+    } catch (removeError) {
       console.error(
-        "Firestore product delete failed:",
-        deleteError
+        "Product API deactivation failed:",
+        removeError
       );
 
       alert(
-        deleteError?.message ||
-        "Product delete కాలేదు."
+        removeError?.message ||
+        "Product deactivate కాలేదు."
       );
 
       return {
         success: false,
-        error: deleteError
+        error: removeError
       };
     }
   }

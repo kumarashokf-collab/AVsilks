@@ -4,6 +4,10 @@ const {
   randomUUID,
 } = require('node:crypto');
 
+const {
+  FieldValue,
+} = require('firebase-admin/firestore');
+
 const ARTISAN_REPOSITORY_ERROR =
   Object.freeze({
     INVALID_INPUT: 'INVALID_INPUT',
@@ -11,6 +15,8 @@ const ARTISAN_REPOSITORY_ERROR =
       'INVALID_DEPENDENCIES',
     ARTISAN_CODE_CONFLICT:
       'ARTISAN_CODE_CONFLICT',
+    INVALID_ARTISAN_DATA:
+      'INVALID_ARTISAN_DATA',
   });
 
 function createRepositoryError(
@@ -64,15 +70,15 @@ function resolveDependencies(
 
   const {
     db,
-    admin,
   } = require('../config/firebase');
 
   if (
     !db ||
     typeof db.runTransaction !==
       'function' ||
-    !admin?.firestore?.FieldValue
-      ?.serverTimestamp
+    typeof FieldValue
+      ?.serverTimestamp !==
+      'function'
   ) {
     throw createRepositoryError(
       ARTISAN_REPOSITORY_ERROR
@@ -85,8 +91,7 @@ function resolveDependencies(
     db,
 
     serverTimestamp: () =>
-      admin.firestore.FieldValue
-        .serverTimestamp(),
+      FieldValue.serverTimestamp(),
 
     generateArtisanId:
       defaultGenerateArtisanId,
@@ -150,6 +155,270 @@ function buildArtisanRecord(
     createdAt: timestamp,
     updatedAt: timestamp,
   };
+}
+
+function resolveListDependencies(
+  dependencies = {}
+) {
+  const hasExplicitDb =
+    Object.prototype.hasOwnProperty.call(
+      dependencies,
+      'db'
+    );
+
+  if (hasExplicitDb) {
+    if (
+      dependencies.db &&
+      typeof dependencies.db.collection ===
+        'function'
+    ) {
+      return {
+        db: dependencies.db,
+      };
+    }
+
+    throw createRepositoryError(
+      ARTISAN_REPOSITORY_ERROR
+        .INVALID_DEPENDENCIES,
+      'Firestore artisan list repository dependencies are invalid.'
+    );
+  }
+
+  const {
+    db,
+  } = require('../config/firebase');
+
+  if (
+    !db ||
+    typeof db.collection !==
+      'function'
+  ) {
+    throw createRepositoryError(
+      ARTISAN_REPOSITORY_ERROR
+        .INVALID_DEPENDENCIES,
+      'Firestore artisan list repository dependencies are invalid.'
+    );
+  }
+
+  return {
+    db,
+  };
+}
+
+function sanitizeListedArtisan(
+  documentId,
+  artisan
+) {
+  const id =
+    normalizeText(documentId);
+
+  const source =
+    artisan &&
+    typeof artisan === 'object' &&
+    !Array.isArray(artisan)
+      ? artisan
+      : null;
+
+  const storedId =
+    normalizeText(source?.id);
+
+  const artisanCode =
+    canonicalizeArtisanCode(
+      source?.artisanCode
+    );
+
+  const displayName =
+    normalizeText(
+      source?.displayName
+    );
+
+  const craftType =
+    normalizeText(
+      source?.craftType
+    );
+
+  const village =
+    normalizeText(
+      source?.village
+    );
+
+  const district =
+    normalizeText(
+      source?.district
+    );
+
+  const state =
+    normalizeText(
+      source?.state
+    );
+
+  const country =
+    normalizeText(
+      source?.country
+    );
+
+  const loomType =
+    normalizeText(
+      source?.loomType
+    );
+
+  if (
+    !id ||
+    id.includes('/') ||
+    storedId !== id ||
+    !artisanCode ||
+    !/^[A-Z0-9][A-Z0-9_-]*$/.test(
+      artisanCode
+    ) ||
+    !displayName ||
+    !craftType ||
+    !village ||
+    !district ||
+    !state ||
+    !country ||
+    !loomType ||
+    source?.active !== true
+  ) {
+    throw createRepositoryError(
+      ARTISAN_REPOSITORY_ERROR
+        .INVALID_ARTISAN_DATA,
+      'Stored artisan data is invalid.'
+    );
+  }
+
+  return Object.freeze({
+    id,
+    artisanCode,
+    displayName,
+    craftType,
+    village,
+    district,
+    state,
+    country,
+    loomType,
+    active: true,
+  });
+}
+
+async function listActiveArtisans(
+  dependencies = {}
+) {
+  const {
+    db,
+  } =
+    resolveListDependencies(
+      dependencies
+    );
+
+  let query;
+
+  try {
+    query =
+      db.collection(
+        'artisans'
+      );
+  } catch {
+    throw createRepositoryError(
+      ARTISAN_REPOSITORY_ERROR
+        .INVALID_DEPENDENCIES,
+      'Firestore artisan list repository dependencies are invalid.'
+    );
+  }
+
+  if (
+    !query ||
+    typeof query.where !== 'function' ||
+    typeof query.limit !== 'function'
+  ) {
+    throw createRepositoryError(
+      ARTISAN_REPOSITORY_ERROR
+        .INVALID_DEPENDENCIES,
+      'Firestore artisan list repository dependencies are invalid.'
+    );
+  }
+
+  const activeQuery =
+    query.where(
+      'active',
+      '==',
+      true
+    );
+
+  if (
+    !activeQuery ||
+    typeof activeQuery.limit !==
+      'function'
+  ) {
+    throw createRepositoryError(
+      ARTISAN_REPOSITORY_ERROR
+        .INVALID_DEPENDENCIES,
+      'Firestore artisan list repository dependencies are invalid.'
+    );
+  }
+
+  const limitedQuery =
+    activeQuery.limit(
+      100
+    );
+
+  if (
+    !limitedQuery ||
+    typeof limitedQuery.get !==
+      'function'
+  ) {
+    throw createRepositoryError(
+      ARTISAN_REPOSITORY_ERROR
+        .INVALID_DEPENDENCIES,
+      'Firestore artisan list repository dependencies are invalid.'
+    );
+  }
+
+  const snapshot =
+    await limitedQuery.get();
+
+  const docs =
+    Array.isArray(
+      snapshot?.docs
+    )
+      ? snapshot.docs
+      : [];
+
+  const artisans =
+    docs.map(
+      (document) => {
+        if (
+          !document ||
+          typeof document.data !==
+            'function'
+        ) {
+          throw createRepositoryError(
+            ARTISAN_REPOSITORY_ERROR
+              .INVALID_ARTISAN_DATA,
+            'Stored artisan data is invalid.'
+          );
+        }
+
+        return sanitizeListedArtisan(
+          document.id,
+          document.data()
+        );
+      }
+    );
+
+  artisans.sort(
+    (left, right) =>
+      left.displayName.localeCompare(
+        right.displayName,
+        'en',
+        {
+          sensitivity: 'base',
+        }
+      )
+  );
+
+  return Object.freeze(
+    artisans
+  );
 }
 
 async function createArtisanWithTransaction(
@@ -275,4 +544,5 @@ module.exports = {
   ARTISAN_REPOSITORY_ERROR,
   canonicalizeArtisanCode,
   createArtisanWithTransaction,
+  listActiveArtisans,
 };

@@ -74,22 +74,18 @@ function loadVerifyAuth({
     loaded: true,
 
     exports: {
-      admin: {
-        auth() {
-          return {
-            verifyIdToken:
-              verifyIdToken ||
-              (async () => ({
-                uid: 'customer-uid-1',
-              })),
+      auth: {
+        verifyIdToken:
+          verifyIdToken ||
+          (async () => ({
+            uid: 'customer-uid-1',
+          })),
 
-            getUser:
-              getUser ||
-              (async () => ({
-                disabled: false,
-              })),
-          };
-        },
+        getUser:
+          getUser ||
+          (async () => ({
+            disabled: false,
+          })),
       },
 
       db: database,

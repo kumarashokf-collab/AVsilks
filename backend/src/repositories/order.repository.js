@@ -1,6 +1,10 @@
 'use strict';
 
 const {
+  FieldValue,
+} = require('firebase-admin/firestore');
+
+const {
   buildOrderCreationPlan,
 } = require('../services/orderCreation.service');
 
@@ -49,14 +53,14 @@ function resolveDependencies(dependencies = {}) {
 
   const {
     db,
-    admin,
   } = require('../config/firebase');
 
   if (
     !db ||
     typeof db.runTransaction !== 'function' ||
-    !admin?.firestore?.FieldValue
-      ?.serverTimestamp
+    typeof FieldValue
+      ?.serverTimestamp !==
+      'function'
   ) {
     throw createRepositoryError(
       ORDER_REPOSITORY_ERROR
@@ -68,8 +72,7 @@ function resolveDependencies(dependencies = {}) {
   return {
     db,
     serverTimestamp: () =>
-      admin.firestore.FieldValue
-        .serverTimestamp(),
+      FieldValue.serverTimestamp(),
   };
 }
 
