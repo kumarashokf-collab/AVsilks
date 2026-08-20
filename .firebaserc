@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "avsilks-5e81a"
+    "default": "avsilks-5e81a",
+    "staging": "avsilks-staging-20260820-01"
   }
 }
