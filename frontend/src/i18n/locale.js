@@ -88,6 +88,14 @@ const TRANSLATIONS = Object.freeze({
       "Searching for sarees matching {query}.",
     "search.voiceError":
       "Voice search did not complete. Please try again or type your search.",
+    "search.ttsAria":
+      "Read assistant message aloud",
+    "search.ttsStopAria":
+      "Stop reading assistant message",
+    "search.ttsUnsupported":
+      "Text-to-speech is not supported in this browser.",
+    "search.ttsError":
+      "The assistant message could not be read aloud. Please try again.",
     "errors.logout":
       "We could not log you out. Please try again.",
   }),
@@ -139,6 +147,14 @@ const TRANSLATIONS = Object.freeze({
       "{query} కోసం సరైన చీరలను వెతుకుతున్నాను.",
     "search.voiceError":
       "వాయిస్ సెర్చ్ పూర్తికాలేదు. మళ్లీ ప్రయత్నించండి లేదా టైప్ చేయండి.",
+    "search.ttsAria":
+      "సహాయకుడి సందేశాన్ని చదివి వినిపించండి",
+    "search.ttsStopAria":
+      "చదవడం ఆపండి",
+    "search.ttsUnsupported":
+      "ఈ బ్రౌజర్‌లో టెక్స్ట్-టు-స్పీచ్ సపోర్ట్ లేదు.",
+    "search.ttsError":
+      "సందేశాన్ని చదివి వినిపించలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
     "errors.logout":
       "లాగ్ అవుట్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
   }),
@@ -190,6 +206,14 @@ const TRANSLATIONS = Object.freeze({
       "{query} से मेल खाने वाली साड़ियां खोज रहे हैं।",
     "search.voiceError":
       "वॉइस सर्च पूरा नहीं हुआ। फिर से प्रयास करें या टाइप करें।",
+    "search.ttsAria":
+      "सहायक संदेश को पढ़कर सुनाएं",
+    "search.ttsStopAria":
+      "पढ़ना बंद करें",
+    "search.ttsUnsupported":
+      "इस ब्राउज़र में टेक्स्ट-टू-स्पीच उपलब्ध नहीं है।",
+    "search.ttsError":
+      "संदेश पढ़कर नहीं सुनाया जा सका। फिर से प्रयास करें।",
     "errors.logout":
       "लॉग आउट नहीं हो सका। कृपया फिर से प्रयास करें।",
   }),
@@ -242,6 +266,14 @@ const TRANSLATIONS = Object.freeze({
       "{query}க்கு பொருந்தும் சேலைகளைத் தேடுகிறோம்.",
     "search.voiceError":
       "குரல் தேடல் முடிவடையவில்லை. மீண்டும் முயற்சிக்கவும் அல்லது தட்டச்சு செய்யவும்.",
+    "search.ttsAria":
+      "உதவியாளர் செய்தியை ஒலியாக வாசிக்கவும்",
+    "search.ttsStopAria":
+      "வாசிப்பதை நிறுத்தவும்",
+    "search.ttsUnsupported":
+      "இந்த உலாவியில் உரை-ஒலி ஆதரவு இல்லை.",
+    "search.ttsError":
+      "செய்தியை வாசிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
     "errors.logout":
       "வெளியேற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
   }),
@@ -303,6 +335,14 @@ const TRANSLATIONS = Object.freeze({
       "{query}ಗೆ ಹೊಂದುವ ಸೀರೆಗಳನ್ನು ಹುಡುಕುತ್ತಿದ್ದೇವೆ.",
     "search.voiceError":
       "ವಾಯ್ಸ್ ಹುಡುಕಾಟ ಪೂರ್ಣವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.",
+    "search.ttsAria":
+      "ಸಹಾಯಕ ಸಂದೇಶವನ್ನು ಧ್ವನಿಯಾಗಿ ಓದಿ",
+    "search.ttsStopAria":
+      "ಓದುವುದನ್ನು ನಿಲ್ಲಿಸಿ",
+    "search.ttsUnsupported":
+      "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಪಠ್ಯ-ದಿಂದ-ಧ್ವನಿ ಬೆಂಬಲವಿಲ್ಲ.",
+    "search.ttsError":
+      "ಸಂದೇಶವನ್ನು ಓದಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
     "errors.logout":
       "ಲಾಗ್ ಔಟ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
   }),
