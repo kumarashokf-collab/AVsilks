@@ -5,10 +5,13 @@ import SectionHeader from "../components/ui/SectionHeader";
 import ProductCard from "../components/ProductCard";
 import SearchAI from "../components/SearchAI";
 import { useProducts } from "../context/ProductContext";
+import { useLocale } from "../context/LocaleContext";
+import { filterProductsByQuery } from "../services/searchMatching";
 import "./Home.css";
 
 function Home() {
   const { products } = useProducts();
+  const { locale } = useLocale();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] =
     useState("");
@@ -23,29 +26,19 @@ function Home() {
     };
   }, [searchQuery]);
 
-  const filteredProducts = useMemo(() => {
-    const query = debouncedSearchQuery.trim().toLowerCase();
-
-    if (!query) {
-      return products;
-    }
-
-    return products.filter((product) => {
-      const searchableText = [
-        product?.name,
-        product?.category,
-        product?.description,
-        product?.sku,
-        product?.color,
-        product?.fabric
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      return searchableText.includes(query);
-    });
-  }, [products, debouncedSearchQuery]);
+  const filteredProducts = useMemo(
+    () =>
+      filterProductsByQuery(
+        products,
+        debouncedSearchQuery,
+        locale
+      ),
+    [
+      products,
+      debouncedSearchQuery,
+      locale
+    ]
+  );
 
   return (
     <main className="home-page">

@@ -213,7 +213,12 @@ test(
 
     assert.match(
       source,
-      /normalizeSearchText/
+      /matchesSearchText/
+    );
+
+    assert.match(
+      source,
+      /localeMeta\.code/
     );
 
     assert.match(
