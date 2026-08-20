@@ -1,0 +1,28 @@
+.language-switcher {
+  width: 100%;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.language-switcher__label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+}
+
+.language-switcher__select {
+  width: 100%;
+  min-height: 44px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-gold-300);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-wine-900);
+  font: inherit;
+  font-weight: 700;
+}
+
+.language-switcher__select:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}

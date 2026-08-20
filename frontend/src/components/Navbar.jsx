@@ -18,13 +18,16 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useCart } from "../context/CartContext";
 import { BRAND } from "../config/branding";
+import { useLocale } from "../context/LocaleContext";
 import { isAdministrativeRole } from "../constants/roles";
+import LanguageSwitcher from "./LanguageSwitcher";
 import "./Navbar.css";
 
 function Navbar({ user, trustedSession }) {
   const [isOpen, setIsOpen] = useState(false);
   const { cart = [] } = useCart();
   const navigate = useNavigate();
+  const { t } = useLocale();
 
   const cartCount = cart.reduce(
     (total, item) => total + Number(item.quantity || 0),
@@ -63,7 +66,7 @@ function Navbar({ user, trustedSession }) {
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout failed:", error);
-      alert("Logout చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.");
+      alert(t("errors.logout"));
     }
   }
 
@@ -75,7 +78,7 @@ function Navbar({ user, trustedSession }) {
             type="button"
             className="site-header__icon-button"
             onClick={() => setIsOpen(true)}
-            aria-label="Open navigation menu"
+            aria-label={t("aria.openMenu")}
           >
             <FaBars />
           </button>
@@ -83,7 +86,7 @@ function Navbar({ user, trustedSession }) {
           <Link
             to="/"
             className="site-header__brand"
-            aria-label={`${BRAND.name} home`}
+            aria-label={t("aria.brandHome", { brand: BRAND.name })}
           >
             <img
               src={BRAND.logo}
@@ -101,11 +104,11 @@ function Navbar({ user, trustedSession }) {
 
           <nav
             className="site-header__desktop-nav"
-            aria-label="Main navigation"
+            aria-label={t("aria.mainNavigation")}
           >
-            <Link to="/">Home</Link>
-            <a href="/#featured-products">Collection</a>
-            <Link to="/privacy">Privacy</Link>
+            <Link to="/">{t("nav.home")}</Link>
+            <a href="/#featured-products">{t("nav.collection")}</a>
+            <Link to="/privacy">{t("nav.privacy")}</Link>
           </nav>
 
           <div className="site-header__actions">
@@ -113,26 +116,26 @@ function Navbar({ user, trustedSession }) {
               <Link
                 to="/profile"
                 className="site-header__account"
-                aria-label="Open profile"
+                aria-label={t("aria.profile")}
               >
                 <FaUser />
-                <span>Profile</span>
+                <span>{t("actions.profile")}</span>
               </Link>
             ) : (
               <Link
                 to="/login"
                 className="site-header__account"
-                aria-label="Login"
+                aria-label={t("aria.login")}
               >
                 <FaSignInAlt />
-                <span>Login</span>
+                <span>{t("actions.login")}</span>
               </Link>
             )}
 
             <Link
               to="/cart"
               className="site-header__cart"
-              aria-label={`Cart with ${cartCount} items`}
+              aria-label={t("aria.cartItems", { count: cartCount })}
             >
               <FaShoppingBag />
 
@@ -159,7 +162,7 @@ function Navbar({ user, trustedSession }) {
           isOpen ? "nav-drawer--open" : ""
         }`}
         aria-hidden={!isOpen}
-        aria-label="Navigation drawer"
+        aria-label={t("aria.drawer")}
       >
         <div className="nav-drawer__header">
           <Link
@@ -183,7 +186,7 @@ function Navbar({ user, trustedSession }) {
             type="button"
             className="nav-drawer__close"
             onClick={closeDrawer}
-            aria-label="Close navigation menu"
+            aria-label={t("aria.closeMenu")}
           >
             <FaTimes />
           </button>
@@ -198,26 +201,30 @@ function Navbar({ user, trustedSession }) {
             <strong>
               {user?.displayName ||
                 user?.phoneNumber ||
-                 `Welcome to ${BRAND.name}` }
+                 t("account.welcome", { brand: BRAND.name }) }
             </strong>
 
             <span>
               {user
-                ? "Your shopping account"
-                : "Login to checkout and view orders"}
+                ? t("account.shoppingAccount")
+                : t("account.loginPrompt")}
             </span>
           </div>
+        </div>
+
+        <div className="nav-drawer__language">
+          <LanguageSwitcher />
         </div>
 
         <nav className="nav-drawer__links">
           <Link to="/" onClick={closeDrawer}>
             <FaHome />
-            <span>Home</span>
+            <span>{t("nav.home")}</span>
           </Link>
 
           <Link to="/cart" onClick={closeDrawer}>
             <FaShoppingBag />
-            <span>My Cart</span>
+            <span>{t("nav.myCart")}</span>
 
             {cartCount > 0 ? (
               <small>{cartCount}</small>
@@ -228,17 +235,17 @@ function Navbar({ user, trustedSession }) {
             <>
               <Link to="/profile" onClick={closeDrawer}>
                 <FaUser />
-                <span>My Profile</span>
+                <span>{t("nav.myProfile")}</span>
               </Link>
 
               <Link to="/orders" onClick={closeDrawer}>
                 <FaBoxOpen />
-                <span>My Orders</span>
+                <span>{t("nav.myOrders")}</span>
               </Link>
 
               <Link to="/settings" onClick={closeDrawer}>
                 <FaCog />
-                <span>Settings</span>
+                <span>{t("nav.settings")}</span>
               </Link>
             </>
           ) : (
@@ -248,13 +255,13 @@ function Navbar({ user, trustedSession }) {
               className="nav-drawer__login-link"
             >
               <FaSignInAlt />
-              <span>Login / Register</span>
+              <span>{t("nav.loginRegister")}</span>
             </Link>
           )}
 
           <Link to="/privacy" onClick={closeDrawer}>
             <FaShieldAlt />
-            <span>Privacy Policy</span>
+            <span>{t("nav.privacyPolicy")}</span>
           </Link>
 
           {isAdmin ? (
@@ -264,7 +271,7 @@ function Navbar({ user, trustedSession }) {
               className="nav-drawer__admin-link"
             >
               <FaUserShield />
-              <span>Admin Panel</span>
+              <span>{t("nav.adminPanel")}</span>
             </Link>
           ) : null}
         </nav>
@@ -277,7 +284,7 @@ function Navbar({ user, trustedSession }) {
               onClick={handleLogout}
             >
               <FaSignOutAlt />
-              Logout
+              {t("actions.logout")}
             </button>
           ) : (
             <Link
@@ -286,7 +293,7 @@ function Navbar({ user, trustedSession }) {
               onClick={closeDrawer}
             >
               <FaSignInAlt />
-              Login to {BRAND.name}
+              {t("actions.loginToBrand", { brand: BRAND.name })}
             </Link>
           )}
 
