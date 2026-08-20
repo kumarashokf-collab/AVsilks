@@ -2,7 +2,7 @@
 set +e
 
 EXPECTED_BRANCH="release/mvp-production-readiness"
-PROJECT_ID="avsilks-5e81a"
+STAGING_PROJECT_ID="avsilks-staging-20260820-01"
 
 fail() {
   echo "$1"
@@ -67,7 +67,7 @@ if [ "$PROJECTS_RC" -ne 0 ]; then
   fail "BLAZE_PREFLIGHT_FIREBASE_ACCESS_GATE=FAIL"
 fi
 
-python3 - "$PROJECTS_TMP" "$PROJECT_ID" <<'PYPROJECT'
+python3 - "$PROJECTS_TMP" "$STAGING_PROJECT_ID" <<'PYPROJECT'
 import json
 import sys
 
