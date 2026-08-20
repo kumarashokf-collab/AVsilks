@@ -16,6 +16,9 @@ import { useLocale } from "../context/LocaleContext";
 import {
   createSpeechRecognition
 } from "../services/voiceSearch";
+import {
+  matchesSearchText
+} from "../services/searchMatching";
 
 const DEFAULT_SUGGESTIONS = [
   "Kanchipuram",
@@ -30,7 +33,6 @@ function SearchAI({
 }) {
   const {
     localeMeta,
-    normalizeSearchText,
     t
   } = useLocale();
 
@@ -95,7 +97,7 @@ function SearchAI({
   const visibleSuggestions =
     useMemo(() => {
       const normalizedQuery =
-        normalizeSearchText(query);
+        String(query ?? "").trim();
 
       if (!normalizedQuery) {
         return suggestions.slice(
@@ -106,15 +108,15 @@ function SearchAI({
 
       return suggestions
         .filter((item) =>
-          normalizeSearchText(
-            String(item ?? "")
-          ).includes(
-            normalizedQuery
+          matchesSearchText(
+            String(item ?? ""),
+            normalizedQuery,
+            localeMeta.code
           )
         )
         .slice(0, 4);
     }, [
-      normalizeSearchText,
+      localeMeta.code,
       query,
       suggestions
     ]);
