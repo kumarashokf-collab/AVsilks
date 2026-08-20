@@ -8,7 +8,9 @@ import {
 import {
   FaMagic,
   FaMicrophone,
-  FaTimes
+  FaStop,
+  FaTimes,
+  FaVolumeUp
 } from "react-icons/fa";
 
 import { BRAND } from "../config/branding";
@@ -19,6 +21,10 @@ import {
 import {
   matchesSearchText
 } from "../services/searchMatching";
+import {
+  cancelSpeech,
+  speakText
+} from "../services/textToSpeech";
 
 const DEFAULT_SUGGESTIONS = [
   "Kanchipuram",
@@ -47,6 +53,9 @@ function SearchAI({
   ] = useState(false);
 
   const [listening, setListening] =
+    useState(false);
+
+  const [speaking, setSpeaking] =
     useState(false);
 
   const [message, setMessage] =
@@ -78,7 +87,9 @@ function SearchAI({
 
   useEffect(() => {
     disposeRecognition();
+    cancelSpeech(window);
     setListening(false);
+    setSpeaking(false);
     setMessage(
       t("search.prompt")
     );
@@ -90,6 +101,7 @@ function SearchAI({
   useEffect(
     () => () => {
       disposeRecognition();
+      cancelSpeech(window);
     },
     []
   );
@@ -147,6 +159,7 @@ function SearchAI({
       })
     );
 
+    stopSpeaking();
     setAssistantOpen(false);
   }
 
@@ -157,7 +170,66 @@ function SearchAI({
     );
   }
 
+  function stopSpeaking() {
+    cancelSpeech(window);
+    setSpeaking(false);
+  }
+
+  function toggleSpeech() {
+    if (speaking) {
+      stopSpeaking();
+      return;
+    }
+
+    disposeRecognition();
+    setListening(false);
+
+    try {
+      const session =
+        speakText({
+          runtime: window,
+          text: message,
+          language:
+            localeMeta.intlLocale,
+          onStart: () => {
+            setSpeaking(true);
+          },
+          onEnd: () => {
+            setSpeaking(false);
+          },
+          onError: () => {
+            setSpeaking(false);
+            setMessage(
+              t("search.ttsError")
+            );
+            setAssistantOpen(true);
+          },
+        });
+
+      if (!session) {
+        setSpeaking(false);
+        setMessage(
+          t(
+            "search.ttsUnsupported"
+          )
+        );
+        setAssistantOpen(true);
+        return;
+      }
+
+      setSpeaking(true);
+    } catch {
+      setSpeaking(false);
+      setMessage(
+        t("search.ttsError")
+      );
+      setAssistantOpen(true);
+    }
+  }
+
   function startVoice() {
+    stopSpeaking();
+
     if (
       recognitionRef.current
     ) {
@@ -351,11 +423,15 @@ function SearchAI({
 
         <button
           type="button"
-          onClick={() =>
+          onClick={() => {
+            if (assistantOpen) {
+              stopSpeaking();
+            }
+
             setAssistantOpen(
-              (open) => !open
-            )
-          }
+              !assistantOpen
+            );
+          }}
           aria-label={t(
             "search.aiOpenAria"
           )}
@@ -421,22 +497,58 @@ function SearchAI({
               {BRAND.shortName} AI
             </strong>
 
-            <button
-              type="button"
-              onClick={() =>
-                setAssistantOpen(
-                  false
-                )
-              }
-              aria-label={t(
-                "search.aiCloseAria"
-              )}
-              style={
-                iconButtonStyle
-              }
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
             >
-              <FaTimes />
-            </button>
+              <button
+                type="button"
+                onClick={
+                  toggleSpeech
+                }
+                aria-label={t(
+                  speaking
+                    ? "search.ttsStopAria"
+                    : "search.ttsAria"
+                )}
+                aria-pressed={
+                  speaking
+                }
+                style={{
+                  ...iconButtonStyle,
+                  color: speaking
+                    ? "var(--color-danger)"
+                    : "var(--color-wine-800)"
+                }}
+              >
+                {speaking ? (
+                  <FaStop />
+                ) : (
+                  <FaVolumeUp />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  stopSpeaking();
+                  setAssistantOpen(
+                    false
+                  );
+                }}
+                aria-label={t(
+                  "search.aiCloseAria"
+                )}
+                style={
+                  iconButtonStyle
+                }
+              >
+                <FaTimes />
+              </button>
+            </div>
           </div>
 
           <p
