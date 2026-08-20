@@ -69,6 +69,25 @@ const TRANSLATIONS = Object.freeze({
     "aria.cartItems": "Cart with {count} items",
     "aria.drawer": "Navigation drawer",
     "aria.brandHome": "{brand} home",
+    "search.placeholder": "Search sarees...",
+    "search.aria": "Search sarees",
+    "search.clearAria": "Clear search",
+    "search.voiceAria": "Start voice search",
+    "search.aiOpenAria": "Open AI search assistant",
+    "search.aiCloseAria": "Close AI assistant",
+    "search.aiDialogAria": "{brand} AI assistant",
+    "search.prompt":
+      "Search by saree name, colour, or category.",
+    "search.showing":
+      "Showing sarees related to {query}.",
+    "search.voiceUnsupported":
+      "Voice search is not supported in this browser. Please type in the search box.",
+    "search.voiceListening":
+      "Listening... tell us what saree you are looking for.",
+    "search.voiceSearching":
+      "Searching for sarees matching {query}.",
+    "search.voiceError":
+      "Voice search did not complete. Please try again or type your search.",
     "errors.logout":
       "We could not log you out. Please try again.",
   }),
@@ -101,6 +120,25 @@ const TRANSLATIONS = Object.freeze({
     "aria.cartItems": "కార్ట్‌లో {count} వస్తువులు",
     "aria.drawer": "నావిగేషన్ డ్రాయర్",
     "aria.brandHome": "{brand} హోమ్",
+    "search.placeholder": "చీరల కోసం వెతకండి...",
+    "search.aria": "చీరలను వెతకండి",
+    "search.clearAria": "వెతుకులాటను క్లియర్ చేయండి",
+    "search.voiceAria": "వాయిస్ సెర్చ్ ప్రారంభించండి",
+    "search.aiOpenAria": "AI సెర్చ్ సహాయకుడిని తెరవండి",
+    "search.aiCloseAria": "AI సహాయకుడిని మూసివేయండి",
+    "search.aiDialogAria": "{brand} AI సహాయకుడు",
+    "search.prompt":
+      "మీకు కావాల్సిన చీర పేరు, రంగు లేదా కేటగిరీని వెతకండి.",
+    "search.showing":
+      "{query}కు సంబంధించిన చీరలను చూపిస్తున్నాను.",
+    "search.voiceUnsupported":
+      "ఈ బ్రౌజర్‌లో వాయిస్ సెర్చ్ సపోర్ట్ లేదు. సెర్చ్ బాక్స్‌లో టైప్ చేయండి.",
+    "search.voiceListening":
+      "వింటున్నాను... మీకు కావాల్సిన చీర గురించి చెప్పండి.",
+    "search.voiceSearching":
+      "{query} కోసం సరైన చీరలను వెతుకుతున్నాను.",
+    "search.voiceError":
+      "వాయిస్ సెర్చ్ పూర్తికాలేదు. మళ్లీ ప్రయత్నించండి లేదా టైప్ చేయండి.",
     "errors.logout":
       "లాగ్ అవుట్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
   }),
@@ -133,6 +171,25 @@ const TRANSLATIONS = Object.freeze({
     "aria.cartItems": "कार्ट में {count} आइटम",
     "aria.drawer": "नेविगेशन ड्रॉअर",
     "aria.brandHome": "{brand} होम",
+    "search.placeholder": "साड़ियां खोजें...",
+    "search.aria": "साड़ियां खोजें",
+    "search.clearAria": "खोज साफ करें",
+    "search.voiceAria": "वॉइस सर्च शुरू करें",
+    "search.aiOpenAria": "AI सर्च सहायक खोलें",
+    "search.aiCloseAria": "AI सहायक बंद करें",
+    "search.aiDialogAria": "{brand} AI सहायक",
+    "search.prompt":
+      "साड़ी का नाम, रंग या श्रेणी खोजें।",
+    "search.showing":
+      "{query} से संबंधित साड़ियां दिखा रहे हैं।",
+    "search.voiceUnsupported":
+      "इस ब्राउज़र में वॉइस सर्च उपलब्ध नहीं है। कृपया सर्च बॉक्स में टाइप करें।",
+    "search.voiceListening":
+      "सुन रहे हैं... बताइए आपको कैसी साड़ी चाहिए।",
+    "search.voiceSearching":
+      "{query} से मेल खाने वाली साड़ियां खोज रहे हैं।",
+    "search.voiceError":
+      "वॉइस सर्च पूरा नहीं हुआ। फिर से प्रयास करें या टाइप करें।",
     "errors.logout":
       "लॉग आउट नहीं हो सका। कृपया फिर से प्रयास करें।",
   }),
@@ -166,6 +223,25 @@ const TRANSLATIONS = Object.freeze({
     "aria.cartItems": "வண்டியில் {count} பொருட்கள்",
     "aria.drawer": "வழிசெலுத்தல் பலகம்",
     "aria.brandHome": "{brand} முகப்பு",
+    "search.placeholder": "சேலைகளைத் தேடுங்கள்...",
+    "search.aria": "சேலைகளைத் தேடுங்கள்",
+    "search.clearAria": "தேடலை அழிக்கவும்",
+    "search.voiceAria": "குரல் தேடலைத் தொடங்கவும்",
+    "search.aiOpenAria": "AI தேடல் உதவியாளரைத் திறக்கவும்",
+    "search.aiCloseAria": "AI உதவியாளரை மூடவும்",
+    "search.aiDialogAria": "{brand} AI உதவியாளர்",
+    "search.prompt":
+      "சேலையின் பெயர், நிறம் அல்லது வகையைத் தேடுங்கள்.",
+    "search.showing":
+      "{query} தொடர்பான சேலைகளை காட்டுகிறோம்.",
+    "search.voiceUnsupported":
+      "இந்த உலாவியில் குரல் தேடல் ஆதரவு இல்லை. தேடல் பெட்டியில் தட்டச்சு செய்யவும்.",
+    "search.voiceListening":
+      "கேட்கிறோம்... உங்களுக்கு வேண்டிய சேலையைச் சொல்லுங்கள்.",
+    "search.voiceSearching":
+      "{query}க்கு பொருந்தும் சேலைகளைத் தேடுகிறோம்.",
+    "search.voiceError":
+      "குரல் தேடல் முடிவடையவில்லை. மீண்டும் முயற்சிக்கவும் அல்லது தட்டச்சு செய்யவும்.",
     "errors.logout":
       "வெளியேற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
   }),
@@ -208,6 +284,25 @@ const TRANSLATIONS = Object.freeze({
       "ನ್ಯಾವಿಗೇಶನ್ ಡ್ರಾಯರ್",
     "aria.brandHome":
       "{brand} ಮುಖಪುಟ",
+    "search.placeholder": "ಸೀರೆಗಳನ್ನು ಹುಡುಕಿ...",
+    "search.aria": "ಸೀರೆಗಳನ್ನು ಹುಡುಕಿ",
+    "search.clearAria": "ಹುಡುಕಾಟವನ್ನು ತೆರವುಗೊಳಿಸಿ",
+    "search.voiceAria": "ವಾಯ್ಸ್ ಹುಡುಕಾಟ ಪ್ರಾರಂಭಿಸಿ",
+    "search.aiOpenAria": "AI ಹುಡುಕಾಟ ಸಹಾಯಕವನ್ನು ತೆರೆಯಿರಿ",
+    "search.aiCloseAria": "AI ಸಹಾಯಕವನ್ನು ಮುಚ್ಚಿರಿ",
+    "search.aiDialogAria": "{brand} AI ಸಹಾಯಕ",
+    "search.prompt":
+      "ಸೀರೆಯ ಹೆಸರು, ಬಣ್ಣ ಅಥವಾ ವರ್ಗವನ್ನು ಹುಡುಕಿ.",
+    "search.showing":
+      "{query}ಗೆ ಸಂಬಂಧಿಸಿದ ಸೀರೆಗಳನ್ನು ತೋರಿಸುತ್ತಿದ್ದೇವೆ.",
+    "search.voiceUnsupported":
+      "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ವಾಯ್ಸ್ ಹುಡುಕಾಟ ಬೆಂಬಲವಿಲ್ಲ. ಹುಡುಕಾಟ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ.",
+    "search.voiceListening":
+      "ಕೇಳುತ್ತಿದ್ದೇವೆ... ನಿಮಗೆ ಬೇಕಾದ ಸೀರೆಯ ಬಗ್ಗೆ ಹೇಳಿ.",
+    "search.voiceSearching":
+      "{query}ಗೆ ಹೊಂದುವ ಸೀರೆಗಳನ್ನು ಹುಡುಕುತ್ತಿದ್ದೇವೆ.",
+    "search.voiceError":
+      "ವಾಯ್ಸ್ ಹುಡುಕಾಟ ಪೂರ್ಣವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.",
     "errors.logout":
       "ಲಾಗ್ ಔಟ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
   }),
