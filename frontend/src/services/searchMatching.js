@@ -1,6 +1,11 @@
 import {
   normalizeSearchText
 } from "../i18n/locale.js";
+import {
+  matchesNaturalLanguageFilters,
+  parseNaturalLanguageQuery
+} from "./naturalLanguageFilters.js";
+
 
 export const SEARCH_ALIAS_GROUPS =
   Object.freeze([
@@ -480,22 +485,43 @@ export function filterProductsByQuery(
       ? products
       : [];
 
-  const normalizedQuery =
-    normalizeSearchText(
+  const filters =
+    parseNaturalLanguageQuery(
       query,
       locale
     );
 
-  if (!normalizedQuery) {
+  if (
+    !filters.textQuery &&
+    filters.recognizedFilterCount === 0
+  ) {
     return safeProducts;
   }
 
+  if (filters.impossible) {
+    return [];
+  }
+
   return safeProducts.filter(
-    (product) =>
-      matchesProductSearch(
+    (product) => {
+      if (
+        !matchesNaturalLanguageFilters(
+          product,
+          filters
+        )
+      ) {
+        return false;
+      }
+
+      if (!filters.textQuery) {
+        return true;
+      }
+
+      return matchesProductSearch(
         product,
-        normalizedQuery,
+        filters.textQuery,
         locale
-      )
+      );
+    }
   );
 }
