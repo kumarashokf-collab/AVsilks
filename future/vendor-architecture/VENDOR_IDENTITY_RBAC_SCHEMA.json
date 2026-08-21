@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "identity": {
+    "authIdentity": "uid",
+    "tenantIdentity": "vendorId",
+    "vendorIdClientAuthoritative": false,
+    "kycStatusIsAuthentication": false
+  },
+  "membership": {
+    "required": true,
+    "serverValidated": true,
+    "states": [
+      "active",
+      "suspended",
+      "revoked"
+    ],
+    "capabilityGroups": [
+      "vendor-owner",
+      "catalog-manager",
+      "order-fulfillment",
+      "inventory-manager",
+      "reports-analyst"
+    ]
+  },
+  "trustedContext": [
+    "uid",
+    "trustedPlatformRole",
+    "vendorId",
+    "membershipState",
+    "vendorCapabilities"
+  ],
+  "tenantRules": [
+    "every-protected-vendor-resource-has-vendor-owner-scope",
+    "vendor-scope-derived-from-trusted-membership",
+    "cross-vendor-read-denied-by-default",
+    "cross-vendor-write-denied-by-default",
+    "client-vendor-id-never-sufficient-authorization",
+    "disabled-suspended-revoked-membership-fails-closed"
+  ],
+  "platformElevation": {
+    "adminCrossTenantAccess": "explicit-permission-only",
+    "ownerCrossTenantAccess": "explicit-permission-only",
+    "elevatedActionsAudited": true,
+    "reasonRequiredForSensitiveOverride": true
+  },
+  "resourceScopes": [
+    "products",
+    "orders",
+    "inventory",
+    "reports",
+    "analytics",
+    "profile",
+    "kyc",
+    "store",
+    "audit"
+  ],
+  "privacy": {
+    "rawGovernmentIdInIdentityContext": false,
+    "rawKycDocumentInRoleClaims": false,
+    "governmentIdUsedAsVendorId": false
+  },
+  "invariants": [
+    "authentication-before-vendor-authorization",
+    "trusted-membership-before-resource-access",
+    "least-privilege-capabilities",
+    "deny-cross-tenant-by-default",
+    "vendor-cannot-self-grant-capabilities",
+    "vendor-cannot-change-trusted-platform-role",
+    "vendor-cannot-select-another-tenant-by-request-body",
+    "revoked-membership-denies-access",
+    "elevated-cross-tenant-actions-audited",
+    "kyc-status-does-not-replace-authentication"
+  ]
+}

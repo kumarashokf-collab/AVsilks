@@ -4,13 +4,28 @@ Status: FUTURE ONLY / PARKED
 
 After verified V-FUTURE-01:
 
-**10% Complete / 90% Pending**
+**25% Complete / 75% Pending**
 
 ### V-FUTURE-01
 Foundation, isolation, Blaze P0 interrupt rule and KYC privacy boundary.
 
 ### V-FUTURE-02
-Vendor Identity, RBAC and Tenant Isolation. Target: 25%.
+Vendor Identity, RBAC and Tenant Isolation.
+
+Complete.
+
+Locked architecture defines:
+
+- separate uid and vendorId identities
+- trusted server-validated vendor membership
+- active/suspended/revoked membership states
+- least-privilege Vendor capability groups
+- vendor-scoped protected resources
+- deny-by-default cross-tenant access
+- client vendorId never sufficient authorization
+- explicit audited platform-admin/owner elevation
+- KYC separate from authentication
+- government-ID exclusion from tenant identity and role claims
 
 ### V-FUTURE-03
 Vendor Products + Admin Approval + Pending/Approved/Rejected/Resubmit.
