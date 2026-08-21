@@ -9,7 +9,7 @@ production-readiness percentage.
 
 Future Multi-Category Architecture:
 
-**75% Complete / 25% Pending**
+**85% Complete / 15% Pending**
 
 Baseline date: 2026-08-21
 
@@ -25,7 +25,7 @@ The percentage may increase only after a defined architecture gate:
 
 Documentation drafts alone do not increase progress.
 
-## Completed Architecture Foundation — 75%
+## Completed Architecture Foundation — 85%
 
 ### A-FUTURE-01 — Isolation and Governance
 
@@ -186,19 +186,25 @@ Locked architecture defines:
 - no personal tracking requirement
 - no external LLM requirement
 
-## Pending Architecture — 25%
-
 ### A-FUTURE-11 — Provenance Compatibility Architecture
 
-Pending detailed design.
+Complete.
 
-Define:
+Locked architecture defines:
 
-- required
-- eligible
-- not_applicable
+- required / eligible / not_applicable eligibility
+- eligibility separate from publication
+- commerce identity separate from public provenance identity
+- stable opaque public provenance IDs
+- protected provenance mutations
+- anonymous-safe public verification boundary
+- immutable published snapshots
+- audited revision/correction model
+- allowlisted public projection
+- artisan publication-consent requirement
+- private contact/internal/payment data exclusion
 
-while keeping commerce identity separate from public provenance identity.
+## Pending Architecture — 15%
 
 ### A-FUTURE-12 — Schema Versioning and Migration
 
@@ -262,7 +268,7 @@ The future branch is a parked architecture branch.
 
 Current baseline:
 
-`FUTURE_ARCHITECTURE_PROGRESS=75`
+`FUTURE_ARCHITECTURE_PROGRESS=85`
 
 Next percentage increase occurs only after the next verified architecture
 gate is remote-locked.

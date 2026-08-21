@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "eligibility": [
+    "required",
+    "eligible",
+    "not_applicable"
+  ],
+  "identity": {
+    "commerceProductIdPublic": false,
+    "opaquePublicIdRequired": true,
+    "publicIdStable": true
+  },
+  "publication": {
+    "publicVerificationMayBeAnonymous": true,
+    "createUpdatePublishRequiresTrustedAuthorization": true,
+    "publishedSnapshotImmutable": true,
+    "correctionsRequireNewAuditedRevision": true
+  },
+  "publicProjection": {
+    "allowlistOnly": true,
+    "allowedConcepts": [
+      "publicId",
+      "productDisplayName",
+      "categoryDisplayName",
+      "craftType",
+      "weave",
+      "material",
+      "originRegion",
+      "verificationStatus",
+      "issuedAt",
+      "provenanceVersion",
+      "artisanDisplayNameIfConsented"
+    ],
+    "forbiddenConcepts": [
+      "internalUid",
+      "vendorInternalId",
+      "email",
+      "phone",
+      "fullAddress",
+      "paymentData",
+      "adminNotes",
+      "secretValues"
+    ]
+  },
+  "artisanPrivacy": {
+    "displayNameRequiresPublicationConsent": true,
+    "contactDetailsPublic": false,
+    "internalIdentityPublic": false
+  },
+  "invariants": [
+    "commerce-identity-separated-from-public-provenance",
+    "public-id-opaque",
+    "public-output-allowlist-only",
+    "published-snapshot-immutable",
+    "provenance-mutations-protected",
+    "artisan-publication-consent-required",
+    "no-private-contact-data-public",
+    "eligibility-does-not-imply-publication",
+    "not-applicable-products-have-no-required-provenance",
+    "audit-history-preserved"
+  ]
+}
