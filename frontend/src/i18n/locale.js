@@ -96,6 +96,7 @@ const TRANSLATIONS = Object.freeze({
       "Text-to-speech is not supported in this browser.",
     "search.ttsError":
       "The assistant message could not be read aloud. Please try again.",
+    "recommendations.title": "You may also like",
     "errors.logout":
       "We could not log you out. Please try again.",
   }),
@@ -155,6 +156,7 @@ const TRANSLATIONS = Object.freeze({
       "ఈ బ్రౌజర్‌లో టెక్స్ట్-టు-స్పీచ్ సపోర్ట్ లేదు.",
     "search.ttsError":
       "సందేశాన్ని చదివి వినిపించలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
+    "recommendations.title": "మీకు ఇవి కూడా నచ్చవచ్చు",
     "errors.logout":
       "లాగ్ అవుట్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
   }),
@@ -214,6 +216,7 @@ const TRANSLATIONS = Object.freeze({
       "इस ब्राउज़र में टेक्स्ट-टू-स्पीच उपलब्ध नहीं है।",
     "search.ttsError":
       "संदेश पढ़कर नहीं सुनाया जा सका। फिर से प्रयास करें।",
+    "recommendations.title": "आपको ये भी पसंद आ सकती हैं",
     "errors.logout":
       "लॉग आउट नहीं हो सका। कृपया फिर से प्रयास करें।",
   }),
@@ -274,6 +277,7 @@ const TRANSLATIONS = Object.freeze({
       "இந்த உலாவியில் உரை-ஒலி ஆதரவு இல்லை.",
     "search.ttsError":
       "செய்தியை வாசிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
+    "recommendations.title": "இவையும் உங்களுக்கு பிடிக்கலாம்",
     "errors.logout":
       "வெளியேற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
   }),
@@ -343,6 +347,7 @@ const TRANSLATIONS = Object.freeze({
       "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಪಠ್ಯ-ದಿಂದ-ಧ್ವನಿ ಬೆಂಬಲವಿಲ್ಲ.",
     "search.ttsError":
       "ಸಂದೇಶವನ್ನು ಓದಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "recommendations.title": "ಇವುಗಳೂ ನಿಮಗೆ ಇಷ್ಟವಾಗಬಹುದು",
     "errors.logout":
       "ಲಾಗ್ ಔಟ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
   }),
