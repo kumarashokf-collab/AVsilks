@@ -9,7 +9,7 @@ production-readiness percentage.
 
 Future Multi-Category Architecture:
 
-**65% Complete / 35% Pending**
+**75% Complete / 25% Pending**
 
 Baseline date: 2026-08-21
 
@@ -25,7 +25,7 @@ The percentage may increase only after a defined architecture gate:
 
 Documentation drafts alone do not increase progress.
 
-## Completed Architecture Foundation — 65%
+## Completed Architecture Foundation — 75%
 
 ### A-FUTURE-01 — Isolation and Governance
 
@@ -167,25 +167,26 @@ Locked architecture defines:
 - taxonomy/attribute-set-driven Admin forms
 - no hard-coded form per category
 
-## Pending Architecture — 35%
-
 ### A-FUTURE-10 — Search and Discovery Architecture
 
-Pending.
+Complete.
 
-Define future integration for:
+Locked architecture defines:
 
-- multilingual search
-- fuzzy aliases
-- natural-language filters
-- category facets
-- product attributes
-- size
-- fabric
-- color
-- occasion
-- availability
-- provenance
+- five-language discovery foundation
+- multilingual aliases and fuzzy matching
+- constrained natural-language filter parsing
+- taxonomy/product-type facets
+- size/fabric/color/occasion filters
+- authoritative availability filtering
+- authoritative provenance filtering
+- whitelisted filter keys
+- deterministic ranking
+- bounded stable pagination
+- no personal tracking requirement
+- no external LLM requirement
+
+## Pending Architecture — 25%
 
 ### A-FUTURE-11 — Provenance Compatibility Architecture
 
@@ -261,7 +262,7 @@ The future branch is a parked architecture branch.
 
 Current baseline:
 
-`FUTURE_ARCHITECTURE_PROGRESS=65`
+`FUTURE_ARCHITECTURE_PROGRESS=75`
 
 Next percentage increase occurs only after the next verified architecture
 gate is remote-locked.

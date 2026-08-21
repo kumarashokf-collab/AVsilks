@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "supportedLocales": [
+    "en",
+    "te",
+    "hi",
+    "ta",
+    "kn"
+  ],
+  "searchPipeline": [
+    "locale-normalization",
+    "multilingual-alias-expansion",
+    "natural-language-filter-parsing",
+    "fuzzy-text-matching",
+    "structured-filter-application",
+    "availability-provenance-filtering",
+    "deterministic-ranking",
+    "stable-pagination"
+  ],
+  "searchableFields": [
+    "name",
+    "searchAliases",
+    "categoryId",
+    "subcategoryId",
+    "productTypeId",
+    "fabric",
+    "color",
+    "occasion",
+    "tags"
+  ],
+  "facetWhitelist": [
+    "category",
+    "subcategory",
+    "productType",
+    "size",
+    "fabric",
+    "color",
+    "occasion",
+    "price",
+    "availability",
+    "provenance"
+  ],
+  "filterPolicy": {
+    "unknownFilters": "reject",
+    "arbitraryDatabaseFieldAccess": false,
+    "clientAuthoritativeAvailability": false,
+    "clientAuthoritativeProvenance": false
+  },
+  "pagination": {
+    "defaultPageSize": 24,
+    "maxPageSize": 50,
+    "stableOrderingRequired": true
+  },
+  "ranking": {
+    "deterministic": true,
+    "personalTrackingRequired": false,
+    "externalLlmRequired": false
+  },
+  "invariants": [
+    "stable-language-neutral-taxonomy-ids",
+    "translated-labels-not-query-authority",
+    "filter-keys-whitelisted",
+    "availability-derived-from-authoritative-inventory",
+    "provenance-filter-derived-from-authoritative-status",
+    "unknown-filter-fails-closed",
+    "pagination-bounded",
+    "ranking-deterministic",
+    "no-personal-tracking-required"
+  ]
+}
