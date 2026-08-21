@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "targetCatalogSchemaVersion": 1,
+  "taxonomyVersion": "1.0.0",
+  "migrationExecution": "not-authorized",
+  "phases": [
+    "source-discovery",
+    "backup-and-backup-verification",
+    "mapping-plan",
+    "read-only-dry-run",
+    "validation",
+    "staging-migration",
+    "reconciliation",
+    "rollback-drill",
+    "explicit-production-approval",
+    "production-migration",
+    "post-migration-verification"
+  ],
+  "legacySareePolicy": {
+    "preserveProductIdentity": true,
+    "preserveProvenanceLinks": true,
+    "defaultInventoryMode": "single-sku",
+    "inventVariants": false
+  },
+  "variantMigrationPolicy": {
+    "requiresExplicitSourceEvidence": true,
+    "skuCollisionBehavior": "fail-closed",
+    "variantIdentityRegeneration": "forbidden-without-approved-mapping"
+  },
+  "compatibility": {
+    "unknownSchemaVersion": "fail-closed",
+    "silentFieldRepurposing": false,
+    "destructiveRewriteWithoutBackup": false
+  },
+  "requirements": [
+    "verified-backup-before-write",
+    "dry-run-before-write",
+    "stable-id-mapping",
+    "idempotent-migration",
+    "resumable-checkpoints",
+    "source-target-count-reconciliation",
+    "inventory-reconciliation",
+    "sku-collision-detection",
+    "provenance-link-verification",
+    "rollback-plan-tested",
+    "staging-pass-before-production",
+    "explicit-production-approval"
+  ]
+}
