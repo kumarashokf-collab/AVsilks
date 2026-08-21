@@ -9,7 +9,7 @@ production-readiness percentage.
 
 Future Multi-Category Architecture:
 
-**92% Complete / 8% Pending**
+**100% Complete / 0% Pending**
 
 Baseline date: 2026-08-21
 
@@ -25,7 +25,7 @@ The percentage may increase only after a defined architecture gate:
 
 Documentation drafts alone do not increase progress.
 
-## Completed Architecture Foundation — 92%
+## Completed Architecture Foundation — 100%
 
 ### A-FUTURE-01 — Isolation and Governance
 
@@ -225,22 +225,36 @@ Locked architecture defines:
 - staging migration and rollback drill
 - explicit production migration approval
 
-## Pending Architecture — 8%
-
 ### A-FUTURE-13 — Security and Activation Architecture
 
-Pending.
+Complete.
 
-Define future activation gates for:
+Locked architecture defines:
 
-- backend validation
-- RBAC
-- Firestore rules
-- staging
-- migration backup
-- rollback
-- security audit
-- production approval
+- deny-by-default security model
+- authoritative backend validation
+- trusted server-side RBAC
+- least-privilege data rules
+- server-side secret management
+- transactional inventory safety
+- audit/rate-limit/error/privacy boundaries
+- verified backup and dry-run before migration
+- staging and full regression gates
+- security/privacy/provenance re-audit
+- rollback drill
+- explicit production approval
+- fail-closed STOP conditions
+- Blaze approval separate from future activation
+
+## Architecture Design Closure
+
+`COMPLETE_AND_PARKED`
+
+Runtime implementation remains `NOT_ATTEMPTED`.
+
+Migration remains `NOT_ATTEMPTED`.
+
+Production activation remains `NOT_AUTHORIZED`.
 
 ## GitHub Cleanliness Rules
 
@@ -275,9 +289,11 @@ The future branch is a parked architecture branch.
 
 Current baseline:
 
-`FUTURE_ARCHITECTURE_PROGRESS=92`
+`FUTURE_ARCHITECTURE_PROGRESS=100`
 
-Next percentage increase occurs only after the next verified architecture
-gate is remote-locked.
+This future architecture design track is complete and parked.
+
+`100%` means architecture design completion only. It does not mean runtime
+implementation, migration, deployment, or production activation is complete.
 
 MVP / Blaze progress remains independently tracked.
