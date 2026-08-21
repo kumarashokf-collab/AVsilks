@@ -9,7 +9,7 @@ production-readiness percentage.
 
 Future Multi-Category Architecture:
 
-**25% Complete / 75% Pending**
+**35% Complete / 65% Pending**
 
 Baseline date: 2026-08-21
 
@@ -25,7 +25,7 @@ The percentage may increase only after a defined architecture gate:
 
 Documentation drafts alone do not increase progress.
 
-## Completed Architecture Foundation — 25%
+## Completed Architecture Foundation — 35%
 
 ### A-FUTURE-01 — Isolation and Governance
 
@@ -105,18 +105,19 @@ If explicit Blaze/billing approval arrives:
 
 ### A-FUTURE-06 — Canonical Taxonomy v1
 
-Pending.
+Complete.
 
-Define:
+Locked architecture defines:
 
 - category hierarchy
-- subcategory IDs
-- product type IDs
-- attribute-set IDs
-- category ordering
-- activation flags
+- stable subcategory IDs
+- globally unique product-type IDs
+- stable attribute-set references
+- deterministic category ordering
+- disabled-by-default activation flags
+- language-neutral machine IDs
 - translation keys
-- taxonomy version
+- taxonomy version `1.0.0`
 
 ### A-FUTURE-07 — Variant and Inventory Architecture
 
@@ -254,7 +255,7 @@ The future branch is a parked architecture branch.
 
 Current baseline:
 
-`FUTURE_ARCHITECTURE_PROGRESS=25`
+`FUTURE_ARCHITECTURE_PROGRESS=35`
 
 Next percentage increase occurs only after the next verified architecture
 gate is remote-locked.

@@ -1,80 +1,411 @@
 {
   "schemaVersion": 1,
+  "taxonomyVersion": "1.0.0",
   "status": "future-only",
+  "defaultActivation": false,
+  "idPolicy": "stable-language-neutral-kebab-case",
+  "translationPolicy": "display-labels-use-translation-keys",
   "categories": [
     {
       "id": "sarees",
-      "label": "Sarees",
-      "productTypes": [
-        "silk-saree",
-        "cotton-saree",
-        "handloom-saree",
-        "linen-saree",
-        "organza-saree",
-        "kanchipuram-saree",
-        "dharmavaram-saree",
-        "pochampally-saree"
+      "translationKey": "catalog.category.sarees",
+      "order": 10,
+      "enabledByDefault": false,
+      "subcategories": [
+        {
+          "id": "sarees-silk",
+          "translationKey": "catalog.subcategory.sarees.silk",
+          "order": 10,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "silk-saree",
+              "translationKey": "catalog.productType.silkSaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            },
+            {
+              "id": "kanchipuram-saree",
+              "translationKey": "catalog.productType.kanchipuramSaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            },
+            {
+              "id": "dharmavaram-saree",
+              "translationKey": "catalog.productType.dharmavaramSaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "sarees-handloom",
+          "translationKey": "catalog.subcategory.sarees.handloom",
+          "order": 20,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "handloom-saree",
+              "translationKey": "catalog.productType.handloomSaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            },
+            {
+              "id": "pochampally-saree",
+              "translationKey": "catalog.productType.pochampallySaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "sarees-natural-fabrics",
+          "translationKey": "catalog.subcategory.sarees.naturalFabrics",
+          "order": 30,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "cotton-saree",
+              "translationKey": "catalog.productType.cottonSaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            },
+            {
+              "id": "linen-saree",
+              "translationKey": "catalog.productType.linenSaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            },
+            {
+              "id": "organza-saree",
+              "translationKey": "catalog.productType.organzaSaree",
+              "attributeSetId": "saree",
+              "enabledByDefault": false
+            }
+          ]
+        }
       ]
     },
     {
       "id": "womens-wear",
-      "label": "Women's Wear",
-      "productTypes": [
-        "tops",
-        "kurtas-kurtis",
-        "dresses",
-        "salwar-suits",
-        "lehenga",
-        "blouses",
-        "bottoms",
-        "dupattas"
+      "translationKey": "catalog.category.womensWear",
+      "order": 20,
+      "enabledByDefault": false,
+      "subcategories": [
+        {
+          "id": "womens-tops",
+          "translationKey": "catalog.subcategory.womens.tops",
+          "order": 10,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "womens-top",
+              "translationKey": "catalog.productType.womensTop",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            },
+            {
+              "id": "womens-tunic",
+              "translationKey": "catalog.productType.womensTunic",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "womens-ethnic",
+          "translationKey": "catalog.subcategory.womens.ethnic",
+          "order": 20,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "womens-kurta-kurti",
+              "translationKey": "catalog.productType.womensKurtaKurti",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            },
+            {
+              "id": "womens-salwar-suit",
+              "translationKey": "catalog.productType.womensSalwarSuit",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            },
+            {
+              "id": "womens-lehenga",
+              "translationKey": "catalog.productType.womensLehenga",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            },
+            {
+              "id": "womens-blouse",
+              "translationKey": "catalog.productType.womensBlouse",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            },
+            {
+              "id": "womens-dupatta",
+              "translationKey": "catalog.productType.womensDupatta",
+              "attributeSetId": "accessory",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "womens-western",
+          "translationKey": "catalog.subcategory.womens.western",
+          "order": 30,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "womens-dress",
+              "translationKey": "catalog.productType.womensDress",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            },
+            {
+              "id": "womens-bottom",
+              "translationKey": "catalog.productType.womensBottom",
+              "attributeSetId": "womens-top",
+              "enabledByDefault": false
+            }
+          ]
+        }
       ]
     },
     {
       "id": "mens-wear",
-      "label": "Men's Wear",
-      "productTypes": [
-        "shirts",
-        "t-shirts",
-        "kurtas",
-        "trousers",
-        "dhotis-veshtis",
-        "ethnic-sets",
-        "jackets"
+      "translationKey": "catalog.category.mensWear",
+      "order": 30,
+      "enabledByDefault": false,
+      "subcategories": [
+        {
+          "id": "mens-tops",
+          "translationKey": "catalog.subcategory.mens.tops",
+          "order": 10,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "mens-shirt",
+              "translationKey": "catalog.productType.mensShirt",
+              "attributeSetId": "mens-apparel",
+              "enabledByDefault": false
+            },
+            {
+              "id": "mens-tshirt",
+              "translationKey": "catalog.productType.mensTshirt",
+              "attributeSetId": "mens-apparel",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "mens-ethnic",
+          "translationKey": "catalog.subcategory.mens.ethnic",
+          "order": 20,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "mens-kurta",
+              "translationKey": "catalog.productType.mensKurta",
+              "attributeSetId": "mens-apparel",
+              "enabledByDefault": false
+            },
+            {
+              "id": "mens-dhoti-veshti",
+              "translationKey": "catalog.productType.mensDhotiVeshti",
+              "attributeSetId": "mens-apparel",
+              "enabledByDefault": false
+            },
+            {
+              "id": "mens-ethnic-set",
+              "translationKey": "catalog.productType.mensEthnicSet",
+              "attributeSetId": "mens-apparel",
+              "enabledByDefault": false
+            },
+            {
+              "id": "mens-jacket",
+              "translationKey": "catalog.productType.mensJacket",
+              "attributeSetId": "mens-apparel",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "mens-bottoms",
+          "translationKey": "catalog.subcategory.mens.bottoms",
+          "order": 30,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "mens-trouser",
+              "translationKey": "catalog.productType.mensTrouser",
+              "attributeSetId": "mens-apparel",
+              "enabledByDefault": false
+            }
+          ]
+        }
       ]
     },
     {
       "id": "kids-wear",
-      "label": "Kids' Wear",
-      "productTypes": [
-        "girls-dresses",
-        "girls-tops",
-        "boys-shirts",
-        "boys-tshirts",
-        "kids-ethnic-sets",
-        "kids-bottoms",
-        "infant-wear"
+      "translationKey": "catalog.category.kidsWear",
+      "order": 40,
+      "enabledByDefault": false,
+      "subcategories": [
+        {
+          "id": "kids-girls",
+          "translationKey": "catalog.subcategory.kids.girls",
+          "order": 10,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "girls-dress",
+              "translationKey": "catalog.productType.girlsDress",
+              "attributeSetId": "kids-apparel",
+              "enabledByDefault": false
+            },
+            {
+              "id": "girls-top",
+              "translationKey": "catalog.productType.girlsTop",
+              "attributeSetId": "kids-apparel",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "kids-boys",
+          "translationKey": "catalog.subcategory.kids.boys",
+          "order": 20,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "boys-shirt",
+              "translationKey": "catalog.productType.boysShirt",
+              "attributeSetId": "kids-apparel",
+              "enabledByDefault": false
+            },
+            {
+              "id": "boys-tshirt",
+              "translationKey": "catalog.productType.boysTshirt",
+              "attributeSetId": "kids-apparel",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "kids-ethnic",
+          "translationKey": "catalog.subcategory.kids.ethnic",
+          "order": 30,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "kids-ethnic-set",
+              "translationKey": "catalog.productType.kidsEthnicSet",
+              "attributeSetId": "kids-apparel",
+              "enabledByDefault": false
+            }
+          ]
+        },
+        {
+          "id": "kids-infant",
+          "translationKey": "catalog.subcategory.kids.infant",
+          "order": 40,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "infant-wear",
+              "translationKey": "catalog.productType.infantWear",
+              "attributeSetId": "kids-apparel",
+              "enabledByDefault": false
+            }
+          ]
+        }
       ]
     },
     {
       "id": "fabrics",
-      "label": "Fabrics",
-      "productTypes": [
-        "silk-fabric",
-        "cotton-fabric",
-        "linen-fabric",
-        "handloom-fabric",
-        "blouse-piece"
+      "translationKey": "catalog.category.fabrics",
+      "order": 50,
+      "enabledByDefault": false,
+      "subcategories": [
+        {
+          "id": "fabrics-by-material",
+          "translationKey": "catalog.subcategory.fabrics.byMaterial",
+          "order": 10,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "silk-fabric",
+              "translationKey": "catalog.productType.silkFabric",
+              "attributeSetId": "fabric",
+              "enabledByDefault": false
+            },
+            {
+              "id": "cotton-fabric",
+              "translationKey": "catalog.productType.cottonFabric",
+              "attributeSetId": "fabric",
+              "enabledByDefault": false
+            },
+            {
+              "id": "linen-fabric",
+              "translationKey": "catalog.productType.linenFabric",
+              "attributeSetId": "fabric",
+              "enabledByDefault": false
+            },
+            {
+              "id": "handloom-fabric",
+              "translationKey": "catalog.productType.handloomFabric",
+              "attributeSetId": "fabric",
+              "enabledByDefault": false
+            },
+            {
+              "id": "blouse-piece",
+              "translationKey": "catalog.productType.blousePiece",
+              "attributeSetId": "fabric",
+              "enabledByDefault": false
+            }
+          ]
+        }
       ]
     },
     {
       "id": "accessories",
-      "label": "Accessories",
-      "productTypes": [
-        "stoles",
-        "scarves",
-        "shawls",
-        "traditional-accessories"
+      "translationKey": "catalog.category.accessories",
+      "order": 60,
+      "enabledByDefault": false,
+      "subcategories": [
+        {
+          "id": "accessories-textile",
+          "translationKey": "catalog.subcategory.accessories.textile",
+          "order": 10,
+          "enabledByDefault": false,
+          "productTypes": [
+            {
+              "id": "stole",
+              "translationKey": "catalog.productType.stole",
+              "attributeSetId": "accessory",
+              "enabledByDefault": false
+            },
+            {
+              "id": "scarf",
+              "translationKey": "catalog.productType.scarf",
+              "attributeSetId": "accessory",
+              "enabledByDefault": false
+            },
+            {
+              "id": "shawl",
+              "translationKey": "catalog.productType.shawl",
+              "attributeSetId": "accessory",
+              "enabledByDefault": false
+            },
+            {
+              "id": "traditional-accessory",
+              "translationKey": "catalog.productType.traditionalAccessory",
+              "attributeSetId": "accessory",
+              "enabledByDefault": false
+            }
+          ]
+        }
       ]
     }
   ]
