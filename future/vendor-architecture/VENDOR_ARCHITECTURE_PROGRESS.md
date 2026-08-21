@@ -4,7 +4,7 @@ Status: FUTURE ONLY / PARKED
 
 Current verified baseline:
 
-**45% Complete / 55% Pending**
+**60% Complete / 40% Pending**
 
 ### V-FUTURE-01
 Foundation, isolation, Blaze P0 interrupt rule and KYC privacy boundary.
@@ -49,7 +49,26 @@ Locked architecture defines:
 - append-only server-authored review audit trail
 
 ### V-FUTURE-04
-Vendor Orders + Vendor Inventory. Target: 60%.
+Vendor Orders + Vendor Inventory.
+
+Complete.
+
+Locked architecture defines:
+
+- Vendor-scoped fulfillment segments
+- isolation inside multi-Vendor customer orders
+- immutable historical order-line snapshots
+- server-validated fulfillment state transitions
+- Vendor prohibition from changing payment authority
+- single-sku / variant-sku inventory compatibility
+- stock/reservedStock invariants
+- derived availableStock
+- transactional/idempotent reserve/release/consume
+- owned-SKU-only manual adjustments
+- oversell prevention
+- order/inventory reconciliation
+- minimum-necessary customer-data exposure
+- server-authored order/inventory audit events
 
 ### V-FUTURE-05
 Profile + KYC + Store Management. Target: 75%.

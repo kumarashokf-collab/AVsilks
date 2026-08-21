@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "orderArchitecture": {
+    "customerOrderMayContainMultipleVendors": true,
+    "vendorUsesScopedFulfillmentSegment": true,
+    "vendorCanSeeOtherVendorSegments": false,
+    "vendorCanChangePlatformPaymentState": false,
+    "orderLineSnapshotImmutable": true,
+    "vendorScopedFields": [
+      "vendorOrderId",
+      "orderReference",
+      "vendorId",
+      "ownLineItems",
+      "fulfillmentState",
+      "shipmentReference",
+      "vendorFinancialSummary"
+    ]
+  },
+  "fulfillmentStates": [
+    "pending",
+    "accepted",
+    "packed",
+    "shipped",
+    "delivered",
+    "cancelled"
+  ],
+  "vendorFulfillmentActions": {
+    "pending": [
+      "accept"
+    ],
+    "accepted": [
+      "mark-packed"
+    ],
+    "packed": [
+      "mark-shipped"
+    ],
+    "shipped": [],
+    "delivered": [],
+    "cancelled": []
+  },
+  "orderInvariants": [
+    "vendor-sees-own-order-segment-only",
+    "order-line-product-snapshot-immutable",
+    "vendor-cannot-change-order-price",
+    "vendor-cannot-change-order-quantity",
+    "vendor-cannot-change-payment-status",
+    "vendor-cannot-access-other-vendor-lines",
+    "fulfillment-transition-server-validated",
+    "stale-transition-fails-closed",
+    "sensitive-customer-data-minimized"
+  ],
+  "inventory": {
+    "authorityModes": [
+      "single-sku",
+      "variant-sku"
+    ],
+    "fields": [
+      "stock",
+      "reservedStock"
+    ],
+    "derivedAvailableStock": "stock - reservedStock",
+    "serverAuthoritative": true,
+    "transactional": true,
+    "idempotentReservationOperations": true
+  },
+  "inventoryOperations": {
+    "reserve": "system-authoritative",
+    "release": "system-authoritative",
+    "consume": "system-authoritative",
+    "manualAdjustment": "authorized-vendor-capability-with-reason"
+  },
+  "inventoryInvariants": [
+    "stock-non-negative",
+    "reserved-stock-non-negative",
+    "reserved-stock-never-exceeds-stock",
+    "available-stock-derived-not-stored-authority",
+    "vendor-can-adjust-own-sku-only",
+    "cross-vendor-inventory-mutation-denied",
+    "sku-and-variant-ownership-validated",
+    "oversell-prevented-transactionally",
+    "inventory-adjustment-audited",
+    "reservation-operation-idempotent"
+  ],
+  "orderInventoryCoupling": {
+    "orderReservationLinkedByReference": true,
+    "cancellationMayReleaseReservation": true,
+    "successful-consumptionReducesStockAndReservation": true,
+    "doubleConsumptionForbidden": true,
+    "reconciliationRequired": true
+  },
+  "auditEvents": [
+    "vendor-order-accepted",
+    "vendor-order-packed",
+    "vendor-order-shipped",
+    "inventory-adjusted",
+    "inventory-reserved",
+    "inventory-released",
+    "inventory-consumed",
+    "inventory-reconciled"
+  ],
+  "privacy": {
+    "minimumNecessaryCustomerData": true,
+    "paymentCredentialsVisibleToVendor": false,
+    "rawGovernmentIdVisibleToVendor": false,
+    "rawKycDocumentsInOrderOrInventory": false
+  }
+}
