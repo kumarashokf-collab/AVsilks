@@ -4,7 +4,7 @@ Status: FUTURE ONLY / PARKED
 
 Current verified baseline:
 
-**75% Complete / 25% Pending**
+**90% Complete / 10% Pending**
 
 ### V-FUTURE-01
 Foundation, isolation, Blaze P0 interrupt rule and KYC privacy boundary.
@@ -94,7 +94,26 @@ Locked architecture defines:
 - server-authored profile/KYC/Store audit trail
 
 ### V-FUTURE-06
-Dashboard + Reports + Analytics. Target: 90%.
+Dashboard + Reports + Analytics.
+
+Complete.
+
+Locked architecture defines:
+
+- tenant-scoped server-derived Vendor Dashboard
+- product/order/inventory/sales summary concepts
+- versioned authoritative metric definitions
+- explicit currency/timezone/freshness semantics
+- gross-sales / payout separation
+- allowlisted Vendor report types
+- bounded report ranges/pages/filters
+- arbitrary database query prohibition
+- aggregated-by-default Vendor Analytics
+- no raw customer identity requirement for analytics
+- no raw KYC/government-ID data in analytics
+- sanitized capability-controlled report exports
+- audited privileged cross-tenant reporting
+- dashboard/cache values never transactional authority
 
 ### V-FUTURE-07
 Audit Trail + Security + Privacy + Activation Closure. Target: 100%.

@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "dashboard": {
+    "tenantScoped": true,
+    "serverDerived": true,
+    "readOnlySummary": true,
+    "concepts": [
+      "product-status-counts",
+      "pending-review-count",
+      "order-fulfillment-counts",
+      "low-stock-count",
+      "sales-summary",
+      "return-cancellation-summary",
+      "store-status",
+      "kyc-status-summary"
+    ],
+    "crossVendorVisibility": false,
+    "clientSuppliedMetricsAuthoritative": false
+  },
+  "metrics": {
+    "definitionsVersioned": true,
+    "currencyExplicit": true,
+    "timezoneExplicit": true,
+    "dataFreshnessVisible": true,
+    "serverAuthoritative": true,
+    "grossSalesSeparateFromPayout": true,
+    "refundsAndCancellationsExplicit": true
+  },
+  "reports": {
+    "allowlistedTypes": [
+      "sales",
+      "orders",
+      "products",
+      "inventory",
+      "product-approval",
+      "returns-cancellations"
+    ],
+    "tenantScoped": true,
+    "boundedDateRangeRequired": true,
+    "boundedPageSizeRequired": true,
+    "arbitraryDatabaseQueryForbidden": true,
+    "exportsAudited": true
+  },
+  "analytics": {
+    "aggregatedByDefault": true,
+    "tenantScoped": true,
+    "crossVendorBenchmarkingDefault": false,
+    "rawCustomerIdentityRequired": false,
+    "rawOrderAddressRequired": false,
+    "rawKycDataRequired": false,
+    "rawGovernmentIdRequired": false,
+    "externalTrackingRequired": false
+  },
+  "export": {
+    "sanitized": true,
+    "capabilityRequired": true,
+    "bounded": true,
+    "serverGenerated": true,
+    "otherVendorDataForbidden": true,
+    "paymentCredentialsForbidden": true,
+    "rawKycDocumentsForbidden": true,
+    "rawGovernmentIdsForbidden": true,
+    "unnecessaryCustomerPrivateDataForbidden": true
+  },
+  "access": {
+    "vendorCapabilityForReports": "reports-analyst",
+    "serverValidatesVendorTenant": true,
+    "adminCrossTenantRequiresExplicitPermission": true,
+    "adminCrossTenantExportAudited": true
+  },
+  "auditEvents": [
+    "report-viewed",
+    "report-export-requested",
+    "report-export-generated",
+    "analytics-viewed",
+    "admin-cross-tenant-report-accessed"
+  ],
+  "invariants": [
+    "dashboard-derived-from-authoritative-data",
+    "all-vendor-metrics-tenant-scoped",
+    "cross-vendor-data-denied-by-default",
+    "metric-definitions-versioned",
+    "currency-and-timezone-explicit",
+    "data-freshness-visible",
+    "gross-sales-not-equal-payout",
+    "reports-use-allowlisted-types",
+    "report-ranges-and-pages-bounded",
+    "arbitrary-database-query-forbidden",
+    "exports-sanitized-and-audited",
+    "analytics-aggregated-by-default",
+    "raw-customer-identity-not-required-for-analytics",
+    "raw-kyc-and-government-id-data-forbidden",
+    "client-metrics-not-authoritative"
+  ]
+}
