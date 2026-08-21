@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "catalogLifecycle": [
+    "draft",
+    "pending-review",
+    "approved",
+    "published",
+    "inactive",
+    "archived"
+  ],
+  "reviewOutcomes": [
+    "approve",
+    "reject",
+    "request-changes"
+  ],
+  "authority": {
+    "vendor": [
+      "create-own-draft",
+      "edit-own-draft",
+      "submit-own-draft",
+      "view-own-review-status"
+    ],
+    "admin": [
+      "review-submissions",
+      "approve",
+      "reject",
+      "request-changes",
+      "publish",
+      "deactivate"
+    ],
+    "owner": [
+      "all-admin-authority",
+      "catalog-governance",
+      "category-governance",
+      "audit-access"
+    ]
+  },
+  "invariants": [
+    "vendor-cannot-self-approve",
+    "vendor-cannot-self-publish",
+    "vendor-cannot-edit-other-vendor-products",
+    "approval-required-before-publish",
+    "rejection-requires-reason",
+    "review-actions-audited",
+    "publish-actions-audited",
+    "deactivation-is-not-physical-delete",
+    "server-rbac-authoritative",
+    "client-role-claims-not-authoritative"
+  ],
+  "formArchitecture": {
+    "mode": "taxonomy-and-attribute-set-driven",
+    "hardcoded-form-per-category": false,
+    "sources": [
+      "category-id",
+      "product-type-id",
+      "attribute-set-id"
+    ]
+  },
+  "auditFields": [
+    "eventId",
+    "actorUid",
+    "trustedRole",
+    "action",
+    "productId",
+    "fromState",
+    "toState",
+    "reason",
+    "timestamp"
+  ]
+}

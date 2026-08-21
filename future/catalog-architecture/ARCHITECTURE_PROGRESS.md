@@ -9,7 +9,7 @@ production-readiness percentage.
 
 Future Multi-Category Architecture:
 
-**55% Complete / 45% Pending**
+**65% Complete / 35% Pending**
 
 Baseline date: 2026-08-21
 
@@ -25,7 +25,7 @@ The percentage may increase only after a defined architecture gate:
 
 Documentation drafts alone do not increase progress.
 
-## Completed Architecture Foundation — 55%
+## Completed Architecture Foundation — 65%
 
 ### A-FUTURE-01 — Isolation and Governance
 
@@ -150,22 +150,24 @@ Locked architecture defines:
 - server-derived payment gateway amount
 - client-supplied totals rejected
 
-## Pending Architecture — 45%
-
 ### A-FUTURE-09 — Vendor and Admin Catalog Architecture
 
-Pending.
+Complete.
 
-Define:
+Locked architecture defines:
 
-- vendor draft
-- approval
-- rejection
-- publishing
-- deactivation
-- owner/admin authority
-- audit history
-- category-specific forms
+- vendor-owned draft workflow
+- submit/review/approve/reject/request-changes
+- approval before publication
+- vendor self-approval and self-publish prohibition
+- admin review/publish/deactivation authority
+- owner catalog governance
+- trusted server-side RBAC authority
+- auditable lifecycle transitions
+- taxonomy/attribute-set-driven Admin forms
+- no hard-coded form per category
+
+## Pending Architecture — 35%
 
 ### A-FUTURE-10 — Search and Discovery Architecture
 
@@ -259,7 +261,7 @@ The future branch is a parked architecture branch.
 
 Current baseline:
 
-`FUTURE_ARCHITECTURE_PROGRESS=55`
+`FUTURE_ARCHITECTURE_PROGRESS=65`
 
 Next percentage increase occurs only after the next verified architecture
 gate is remote-locked.
