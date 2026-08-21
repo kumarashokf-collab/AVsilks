@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "status": "future-only",
+  "common": [
+    "color",
+    "fabric",
+    "occasion",
+    "care",
+    "countryOfOrigin"
+  ],
+  "attributeSets": {
+    "saree": [
+      "weave",
+      "border",
+      "pallu",
+      "blouseIncluded",
+      "sareeLength",
+      "artisanCraft"
+    ],
+    "womens-top": [
+      "size",
+      "fit",
+      "sleeve",
+      "neckline",
+      "length",
+      "pattern"
+    ],
+    "mens-apparel": [
+      "size",
+      "fit",
+      "sleeve",
+      "collar",
+      "pattern"
+    ],
+    "kids-apparel": [
+      "ageGroup",
+      "size",
+      "genderTarget",
+      "fit",
+      "sleeve",
+      "pattern"
+    ],
+    "fabric": [
+      "material",
+      "weave",
+      "width",
+      "lengthUnit",
+      "artisanCraft"
+    ],
+    "accessory": [
+      "material",
+      "dimensions",
+      "pattern"
+    ]
+  }
+}

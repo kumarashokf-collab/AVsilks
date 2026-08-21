@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "status": "future-only",
+  "categories": [
+    {
+      "id": "sarees",
+      "label": "Sarees",
+      "productTypes": [
+        "silk-saree",
+        "cotton-saree",
+        "handloom-saree",
+        "linen-saree",
+        "organza-saree",
+        "kanchipuram-saree",
+        "dharmavaram-saree",
+        "pochampally-saree"
+      ]
+    },
+    {
+      "id": "womens-wear",
+      "label": "Women's Wear",
+      "productTypes": [
+        "tops",
+        "kurtas-kurtis",
+        "dresses",
+        "salwar-suits",
+        "lehenga",
+        "blouses",
+        "bottoms",
+        "dupattas"
+      ]
+    },
+    {
+      "id": "mens-wear",
+      "label": "Men's Wear",
+      "productTypes": [
+        "shirts",
+        "t-shirts",
+        "kurtas",
+        "trousers",
+        "dhotis-veshtis",
+        "ethnic-sets",
+        "jackets"
+      ]
+    },
+    {
+      "id": "kids-wear",
+      "label": "Kids' Wear",
+      "productTypes": [
+        "girls-dresses",
+        "girls-tops",
+        "boys-shirts",
+        "boys-tshirts",
+        "kids-ethnic-sets",
+        "kids-bottoms",
+        "infant-wear"
+      ]
+    },
+    {
+      "id": "fabrics",
+      "label": "Fabrics",
+      "productTypes": [
+        "silk-fabric",
+        "cotton-fabric",
+        "linen-fabric",
+        "handloom-fabric",
+        "blouse-piece"
+      ]
+    },
+    {
+      "id": "accessories",
+      "label": "Accessories",
+      "productTypes": [
+        "stoles",
+        "scarves",
+        "shawls",
+        "traditional-accessories"
+      ]
+    }
+  ]
+}
