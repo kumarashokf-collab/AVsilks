@@ -4,7 +4,7 @@ Status: FUTURE ONLY / PARKED
 
 Current verified baseline:
 
-**60% Complete / 40% Pending**
+**75% Complete / 25% Pending**
 
 ### V-FUTURE-01
 Foundation, isolation, Blaze P0 interrupt rule and KYC privacy boundary.
@@ -71,7 +71,27 @@ Locked architecture defines:
 - server-authored order/inventory audit events
 
 ### V-FUTURE-05
-Profile + KYC + Store Management. Target: 75%.
+Profile + KYC + Store Management.
+
+Complete.
+
+Locked architecture defines:
+
+- private Vendor Profile / public Store separation
+- vendor-owned profile isolation
+- trusted platform fields not Vendor-authoritative
+- KYC draft/submitted/review/verified/rejected/resubmit lifecycle
+- vendor self-verification prohibition
+- reviewer authority and rejection reason requirement
+- KYC/product-approval independence
+- strict real government-ID development-artifact prohibition
+- provider-reference/minimum-metadata KYC preference
+- KYC document storage requiring separate security/privacy review
+- allowlisted public Store fields
+- privileged Store fields controlled by trusted backend authority
+- self-assigned verified/trust badge prohibition
+- Store publication separate from KYC/product approval
+- server-authored profile/KYC/Store audit trail
 
 ### V-FUTURE-06
 Dashboard + Reports + Analytics. Target: 90%.

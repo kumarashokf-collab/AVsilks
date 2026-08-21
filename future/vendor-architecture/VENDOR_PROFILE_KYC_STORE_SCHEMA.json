@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "profile": {
+    "privateProfileSeparatedFromPublicStore": true,
+    "vendorCanEditOwnPermittedProfileFields": true,
+    "crossVendorProfileAccessDenied": true,
+    "trustedFieldsVendorEditable": false,
+    "privateConcepts": [
+      "account-contact",
+      "support-contact",
+      "kyc-status",
+      "membership-status",
+      "internal-review-metadata"
+    ]
+  },
+  "kyc": {
+    "states": [
+      "draft",
+      "submitted",
+      "under-review",
+      "verified",
+      "rejected",
+      "resubmit-required"
+    ],
+    "vendorCanSelfVerify": false,
+    "vendorCanSetReviewerMetadata": false,
+    "trustedReviewerRequired": true,
+    "rejectionRequiresReasonCode": true,
+    "verificationDoesNotApproveProducts": true,
+    "productApprovalDoesNotVerifyKyc": true
+  },
+  "kycPrivacy": {
+    "realGovernmentIdInDevelopmentArtifacts": false,
+    "rawGovernmentIdInNormalVendorProfile": false,
+    "governmentIdAsVendorId": false,
+    "rawKycDocumentInLogs": false,
+    "rawKycDocumentInAuditEvents": false,
+    "providerReferencePreferred": true,
+    "minimumMetadataPreferred": true,
+    "demoPlaceholderExamples": [
+      "[AADHAAR_REDACTED]",
+      "[GOV_ID_REDACTED]",
+      "[KYC_DOCUMENT_REDACTED]",
+      "[KYC_REFERENCE]"
+    ]
+  },
+  "kycDocumentBoundary": {
+    "providerManagedPreferred": true,
+    "ordinaryPublicStorageForbidden": true,
+    "separateSecurityReviewBeforeStorage": true,
+    "leastPrivilegeReviewerAccess": true,
+    "retentionDeletionPolicyRequiredBeforeImplementation": true,
+    "downloadExposureMinimized": true
+  },
+  "store": {
+    "vendorEditablePublicConcepts": [
+      "displayName",
+      "description",
+      "logo",
+      "banner",
+      "publicContact",
+      "publicPolicies",
+      "socialLinks"
+    ],
+    "privilegedConcepts": [
+      "storeStatus",
+      "verifiedBadge",
+      "platformTrustBadge",
+      "commissionPolicy",
+      "payoutConfiguration",
+      "kycDecision",
+      "platformEnforcementState"
+    ],
+    "vendorCanSelfSetVerifiedBadge": false,
+    "vendorCanChangePlatformCommission": false,
+    "vendorCanChangeKycDecision": false
+  },
+  "publication": {
+    "storeVisibilitySeparateFromKycState": true,
+    "storeVisibilitySeparateFromProductApproval": true,
+    "publicationServerAuthoritative": true
+  },
+  "auditEvents": [
+    "profile-updated",
+    "kyc-submitted",
+    "kyc-review-started",
+    "kyc-verified",
+    "kyc-rejected",
+    "kyc-resubmit-requested",
+    "store-profile-updated",
+    "store-status-changed",
+    "privileged-store-override"
+  ],
+  "invariants": [
+    "private-profile-separated-from-public-store",
+    "cross-vendor-profile-access-denied",
+    "vendor-cannot-self-verify-kyc",
+    "vendor-cannot-write-trusted-review-fields",
+    "real-government-id-development-artifacts-prohibited",
+    "raw-government-id-not-normal-profile-field",
+    "raw-kyc-documents-not-logged",
+    "raw-kyc-documents-not-audited",
+    "vendor-cannot-self-assign-verified-badge",
+    "kyc-and-product-approval-independent",
+    "public-store-fields-explicitly-allowlisted",
+    "privileged-store-fields-server-authoritative"
+  ]
+}
