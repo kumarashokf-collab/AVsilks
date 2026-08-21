@@ -9,7 +9,7 @@ production-readiness percentage.
 
 Future Multi-Category Architecture:
 
-**45% Complete / 55% Pending**
+**55% Complete / 45% Pending**
 
 Baseline date: 2026-08-21
 
@@ -25,7 +25,7 @@ The percentage may increase only after a defined architecture gate:
 
 Documentation drafts alone do not increase progress.
 
-## Completed Architecture Foundation — 45%
+## Completed Architecture Foundation — 55%
 
 ### A-FUTURE-01 — Isolation and Governance
 
@@ -133,21 +133,24 @@ Locked architecture defines:
 - variant lifecycle
 - server-authoritative future price overrides
 
-## Pending Architecture — 55%
-
 ### A-FUTURE-08 — Pricing and Promotion Architecture
 
-Pending.
+Complete.
 
-Define:
+Locked architecture defines:
 
-- base price
-- sale price
-- variant override
-- tax boundary
-- shipping boundary
-- promotion eligibility
-- server-authoritative totals
+- INR integer-paise money model
+- product and variant price precedence
+- server-authoritative pricing
+- sale-price validation
+- promotion eligibility validation
+- deterministic/idempotent promotion application
+- disabled-by-default promotion stacking
+- separate tax and shipping boundaries
+- server-derived payment gateway amount
+- client-supplied totals rejected
+
+## Pending Architecture — 45%
 
 ### A-FUTURE-09 — Vendor and Admin Catalog Architecture
 
@@ -256,7 +259,7 @@ The future branch is a parked architecture branch.
 
 Current baseline:
 
-`FUTURE_ARCHITECTURE_PROGRESS=45`
+`FUTURE_ARCHITECTURE_PROGRESS=55`
 
 Next percentage increase occurs only after the next verified architecture
 gate is remote-locked.

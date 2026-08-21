@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "currency": "INR",
+  "moneyUnit": "paise",
+  "priceAuthority": "server",
+  "priceLayers": [
+    "product-base-price",
+    "product-sale-price",
+    "variant-price-override",
+    "variant-sale-price-override",
+    "promotion-adjustment"
+  ],
+  "precedence": [
+    "eligible-variant-sale-price",
+    "eligible-variant-price",
+    "eligible-product-sale-price",
+    "product-base-price"
+  ],
+  "promotionPolicy": {
+    "clientAuthoritative": false,
+    "requiresEligibilityValidation": true,
+    "requiresServerTimeValidation": true,
+    "requiresIdempotentApplication": true,
+    "stackingDefault": "disabled",
+    "negativeFinalPriceAllowed": false
+  },
+  "boundaries": {
+    "tax": "separate-policy",
+    "shipping": "separate-policy",
+    "paymentGatewayAmount": "derived-from-final-server-total"
+  },
+  "invariants": [
+    "money-stored-as-integer-paise",
+    "price-positive",
+    "sale-price-not-greater-than-effective-regular-price",
+    "variant-override-does-not-create-client-authority",
+    "promotion-cannot-change-inventory-authority",
+    "final-total-server-authoritative",
+    "checkout-recalculates-from-authoritative-data",
+    "client-supplied-total-rejected"
+  ]
+}
