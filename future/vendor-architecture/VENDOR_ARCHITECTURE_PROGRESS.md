@@ -2,9 +2,9 @@
 
 Status: FUTURE ONLY / PARKED
 
-After verified V-FUTURE-01:
+Current verified baseline:
 
-**25% Complete / 75% Pending**
+**45% Complete / 55% Pending**
 
 ### V-FUTURE-01
 Foundation, isolation, Blaze P0 interrupt rule and KYC privacy boundary.
@@ -29,7 +29,24 @@ Locked architecture defines:
 
 ### V-FUTURE-03
 Vendor Products + Admin Approval + Pending/Approved/Rejected/Resubmit.
-Target: 45%.
+
+Complete.
+
+Locked architecture defines:
+
+- vendor-owned product drafts
+- draft/pending/approved/rejected review states
+- audited submit/approve/reject/resubmit transitions
+- resubmit as an action returning to pending
+- vendor self-approval/self-publish prohibition
+- rejection reason requirement
+- locked pending revision
+- immutable approved snapshot
+- revision increment on resubmit/change
+- stale-review fail-closed protection
+- approved separate from published
+- product approval separate from KYC
+- append-only server-authored review audit trail
 
 ### V-FUTURE-04
 Vendor Orders + Vendor Inventory. Target: 60%.

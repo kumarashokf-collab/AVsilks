@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "reviewStates": [
+    "draft",
+    "pending",
+    "approved",
+    "rejected"
+  ],
+  "vendorActions": {
+    "draft": [
+      "edit",
+      "submit"
+    ],
+    "pending": [],
+    "approved": [
+      "create-new-revision"
+    ],
+    "rejected": [
+      "edit",
+      "resubmit"
+    ]
+  },
+  "adminActions": {
+    "pending": [
+      "approve",
+      "reject"
+    ]
+  },
+  "transitions": [
+    {
+      "from": "draft",
+      "action": "submit",
+      "to": "pending"
+    },
+    {
+      "from": "pending",
+      "action": "approve",
+      "to": "approved"
+    },
+    {
+      "from": "pending",
+      "action": "reject",
+      "to": "rejected"
+    },
+    {
+      "from": "rejected",
+      "action": "resubmit",
+      "to": "pending"
+    }
+  ],
+  "reviewPolicy": {
+    "vendorCanSelfApprove": false,
+    "vendorCanSelfPublish": false,
+    "vendorCanSetReviewMetadata": false,
+    "approvedEqualsPublished": false,
+    "rejectionRequiresReason": true,
+    "pendingVendorContentLocked": true,
+    "approvedSnapshotImmutable": true,
+    "approvedContentChangeRequiresNewRevision": true,
+    "serverTimestampsRequired": true
+  },
+  "revisionPolicy": {
+    "revisionStartsAt": 1,
+    "resubmitIncrementsRevision": true,
+    "approvedRevisionRecorded": true,
+    "staleReviewDecisionRejected": true
+  },
+  "audit": {
+    "appendOnly": true,
+    "serverAuthored": true,
+    "events": [
+      "product-created",
+      "product-submitted",
+      "product-approved",
+      "product-rejected",
+      "product-resubmitted",
+      "approved-revision-created"
+    ],
+    "fields": [
+      "eventId",
+      "vendorId",
+      "productId",
+      "revision",
+      "actorUid",
+      "trustedRole",
+      "action",
+      "fromState",
+      "toState",
+      "reasonCode",
+      "timestamp",
+      "requestId"
+    ]
+  },
+  "privacy": {
+    "rawGovernmentIdAllowed": false,
+    "rawKycDocumentAllowed": false,
+    "secretsAllowed": false
+  },
+  "invariants": [
+    "vendor-owns-product-draft",
+    "cross-vendor-product-write-denied",
+    "vendor-cannot-self-approve",
+    "vendor-cannot-self-publish",
+    "pending-content-not-silently-mutated",
+    "rejection-requires-reason",
+    "resubmit-returns-to-pending",
+    "approved-snapshot-immutable",
+    "approved-change-requires-new-revision",
+    "stale-review-decision-fails-closed",
+    "review-events-server-authored",
+    "product-approval-separate-from-kyc",
+    "approved-separate-from-published"
+  ]
+}
