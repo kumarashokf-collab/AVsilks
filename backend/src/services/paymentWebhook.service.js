@@ -142,7 +142,7 @@ async function reconcileCapturedRazorpayWebhook(
   verifyWebhookSignature({
     rawBody,
     signature,
-    secret,
+    webhookSecret: secret,
   });
 
   const event =
