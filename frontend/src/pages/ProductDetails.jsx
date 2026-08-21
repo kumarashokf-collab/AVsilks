@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
+import { useLocale } from '../context/LocaleContext';
+import ProductCard from '../components/ProductCard';
+import { getRuleBasedRecommendations } from '../services/recommendations';
 import { FaArrowLeft, FaStar, FaStarHalfAlt, FaShieldAlt, FaTruck } from 'react-icons/fa';
 
 function ProductDetails() {
@@ -9,10 +12,29 @@ function ProductDetails() {
   const navigate = useNavigate();
   const { products } = useProducts();
   const { addToCart } = useCart();
+  const { locale, t } = useLocale();
 
   const product = products.find(
     (item) => String(item.id) === String(id)
   );
+
+  const recommendations =
+    useMemo(
+      () =>
+        getRuleBasedRecommendations(
+          products,
+          product,
+          {
+            limit: 4,
+            locale
+          }
+        ),
+      [
+        products,
+        product,
+        locale
+      ]
+    );
 
   const productImages = useMemo(() => {
     if (!product) {
@@ -209,6 +231,54 @@ function ProductDetails() {
           {product.stock}
         </div>
       </div>
+
+      {recommendations.length > 0 && (
+        <section
+          aria-labelledby="product-recommendations-title"
+          style={{
+            marginTop: "10px",
+            padding: "20px",
+            background: "white"
+          }}
+        >
+          <h3
+            id="product-recommendations-title"
+            style={{
+              margin: "0 0 16px",
+              color: "#4a1c1c",
+              fontSize: "20px"
+            }}
+          >
+            {t(
+              "recommendations.title"
+            )}
+          </h3>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(210px, 1fr))",
+              gap: "16px"
+            }}
+          >
+            {recommendations.map(
+              (
+                recommendedProduct
+              ) => (
+                <ProductCard
+                  key={
+                    recommendedProduct.id
+                  }
+                  product={
+                    recommendedProduct
+                  }
+                />
+              )
+            )}
+          </div>
+        </section>
+      )}
 
       {isZoomOpen && (
         <div
