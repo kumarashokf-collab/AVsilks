@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0.0",
+  "status": "future-only",
+  "defaultActivation": false,
+  "inventoryModes": {
+    "single-sku": {
+      "authority": "product",
+      "variants": false
+    },
+    "variant-sku": {
+      "authority": "variant",
+      "variants": true
+    }
+  },
+  "variantLifecycle": [
+    "draft",
+    "active",
+    "inactive",
+    "archived"
+  ],
+  "invariants": [
+    "one-inventory-authority",
+    "stock-non-negative-integer",
+    "reserved-stock-non-negative-integer",
+    "reserved-stock-never-exceeds-stock",
+    "available-stock-derived",
+    "sku-globally-unique",
+    "sku-not-reused-after-archive",
+    "variant-id-stable-immutable",
+    "reservation-transactional",
+    "reservation-idempotent"
+  ],
+  "reservation": {
+    "availableStock": "stock - reservedStock",
+    "reserve": {
+      "stock": "same",
+      "reservedStock": "+quantity"
+    },
+    "release": {
+      "stock": "same",
+      "reservedStock": "-quantity"
+    },
+    "consume": {
+      "stock": "-quantity",
+      "reservedStock": "-quantity"
+    }
+  },
+  "variantOverrides": {
+    "price": "optional-server-authoritative",
+    "salePrice": "optional-server-authoritative",
+    "image": "optional"
+  }
+}

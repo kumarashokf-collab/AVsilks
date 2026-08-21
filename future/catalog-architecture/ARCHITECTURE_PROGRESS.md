@@ -9,7 +9,7 @@ production-readiness percentage.
 
 Future Multi-Category Architecture:
 
-**35% Complete / 65% Pending**
+**45% Complete / 55% Pending**
 
 Baseline date: 2026-08-21
 
@@ -25,7 +25,7 @@ The percentage may increase only after a defined architecture gate:
 
 Documentation drafts alone do not increase progress.
 
-## Completed Architecture Foundation — 35%
+## Completed Architecture Foundation — 45%
 
 ### A-FUTURE-01 — Isolation and Governance
 
@@ -101,8 +101,6 @@ If explicit Blaze/billing approval arrives:
 - resume Blaze Stage 1
 - do not begin another future architecture step
 
-## Pending Architecture — 75%
-
 ### A-FUTURE-06 — Canonical Taxonomy v1
 
 Complete.
@@ -121,18 +119,21 @@ Locked architecture defines:
 
 ### A-FUTURE-07 — Variant and Inventory Architecture
 
-Pending.
+Complete.
 
-Define:
+Locked architecture defines:
 
-- products with no variants
-- products with variants
-- variant identity
-- SKU rules
-- stock
-- reserved stock
+- single-sku and variant-sku modes
+- exactly one inventory authority
+- stable variant identity
+- globally unique non-reused SKU
+- stock/reservedStock invariants
+- derived available stock
+- transactional/idempotent reservation model
 - variant lifecycle
-- variant-level image/price overrides
+- server-authoritative future price overrides
+
+## Pending Architecture — 55%
 
 ### A-FUTURE-08 — Pricing and Promotion Architecture
 
@@ -255,7 +256,7 @@ The future branch is a parked architecture branch.
 
 Current baseline:
 
-`FUTURE_ARCHITECTURE_PROGRESS=35`
+`FUTURE_ARCHITECTURE_PROGRESS=45`
 
 Next percentage increase occurs only after the next verified architecture
 gate is remote-locked.
